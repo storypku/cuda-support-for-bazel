@@ -13,16 +13,16 @@ def if_cuda(if_true, if_false = []):
     })
 
 def if_cuda_clang(if_true, if_false = []):
-   """Shorthand for select()'ing on wheteher we're building with cuda-clang.
+    """Shorthand for select()'ing on wheteher we're building with cuda-clang.
 
-    Returns a select statement which evaluates to if_true if we're building
-    with cuda-clang.  Otherwise, the select statement evaluates to if_false.
+     Returns a select statement which evaluates to if_true if we're building
+     with cuda-clang.  Otherwise, the select statement evaluates to if_false.
 
-   """
-   return select({
-       "@local_config_cuda//cuda:using_clang": if_true,
-       "//conditions:default": if_false
-   })
+    """
+    return select({
+        "@local_config_cuda//cuda:using_clang": if_true,
+        "//conditions:default": if_false,
+    })
 
 def cuda_default_copts():
     """Default options for all CUDA compilations."""
@@ -39,7 +39,7 @@ def if_cuda_is_configured(x):
     --config=cuda. Used to allow non-CUDA code to depend on CUDA libraries.
     """
     if cuda_is_configured():
-      return select({"//conditions:default": x})
+        return select({"//conditions:default": x})
     return select({"//conditions:default": []})
 
 def cuda_header_library(

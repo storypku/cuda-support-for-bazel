@@ -25,3 +25,11 @@ As of Fri May 22 22:22:59 CST 2020, this project is still a Work-In-Progress, wi
 - TensorRT support was not tailored yet
 - NCCL support was not tailored yet.
 
+## Stripped Modules/Dependencies
+- [gemmlowp](https://github.com/google/gemmlowp)
+- [mkl](https://software.intel.com/content/www/us/en/develop/tools/math-kernel-library.html)
+- nccl
+- tensorflow/workspace.bzl
+
+## Fancy Bazel!
+
