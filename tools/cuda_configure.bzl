@@ -739,7 +739,6 @@ def _compute_cuda_gpu_architectures(repository_ctx, compute_capabilities):
     return str(gpu_architectures)
 
 def _tpl_path(repository_ctx, filename):
-    print("{}".format(filename))
     return repository_ctx.path(Label("//tools/%s.tpl" % filename))
 
 def _basename(repository_ctx, path_str):
@@ -761,7 +760,7 @@ def _create_local_cuda_repository(repository_ctx):
     # See https://github.com/tensorflow/tensorflow/commit/62bd3534525a036f07d9851b3199d68212904778
     tpl_paths = {filename: _tpl_path(repository_ctx, filename) for filename in [
         "cuda:build_defs.bzl",
-        "crosstool:clang/bin/crosstool_wrapper_driver_is_not_gcc.bzl",
+        "crosstool:clang/bin/crosstool_wrapper_driver_is_not_gcc",
         "crosstool:BUILD",
         "crosstool:cc_toolchain_config.bzl",
         "cuda:cuda_config.h",

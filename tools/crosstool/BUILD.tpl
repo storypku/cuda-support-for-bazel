@@ -27,6 +27,8 @@ cc_toolchain_suite(
         "local|compiler": ":cc-compiler-local",
         "arm": ":cc-compiler-local",
         "aarch64": ":cc-compiler-local",
+        "k8": ":cc-compiler-local",
+
     },
 )
 
