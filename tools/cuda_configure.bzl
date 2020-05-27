@@ -768,7 +768,7 @@ def _create_local_cuda_repository(repository_ctx):
     ]}
     tpl_paths["cuda:BUILD"] = _tpl_path(repository_ctx, "cuda:BUILD")
 
-    find_cuda_config_script = repository_ctx.path(Label("@apollo//tools:find_cuda_config.py.gz.base64"))
+    find_cuda_config_script = repository_ctx.path(Label("//tools:find_cuda_config.py.gz.base64"))
 
     cuda_config = _get_cuda_config(repository_ctx, find_cuda_config_script)
 
