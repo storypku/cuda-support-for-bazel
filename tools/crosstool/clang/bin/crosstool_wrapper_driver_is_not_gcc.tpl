@@ -27,11 +27,6 @@ DESCRIPTION:
   as is as a string to --compiler-options of nvcc. When "-x cuda" is not
   present, this wrapper invokes hybrid_driver_is_not_gcc with the input
   arguments as is.
-
-NOTES: TODO(storypku)
-  Changes to the contents of this file must be propagated from
-  //tools/crosstool/crosstool_wrapper_is_not_gcc to
-  //tools/crosstool/clang/bin/crosstool_wrapper_is_not_gcc
 """
 
 from __future__ import print_function

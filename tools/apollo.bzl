@@ -64,18 +64,20 @@ def lrt_if_needed():
 #    ]
 
 # if_tensorrt(["-DGOOGLE_TENSORRT=1"]) +
-#def apollo_copts(allow_exceptions = False):
-#    return [
-#        "-DEIGEN_AVOID_STL_ARRAY",
-#        "-Wno-sign-compare",
-#        "-ftemplate-depth=900",
-#    ] + if_cuda(["-DGOOGLE_CUDA=1"]) +
-#    if_nvcc(["-DTENSORFLOW_USE_NVCC=1"]) +
-#    if_x86_mode(["-msse3"]) +
-#    (["-fno-exceptions"] if not allow_exceptions else []) +
-#    ["-pthread"]
+def apollo_copts(allow_exceptions = False):
+    return (
+        [
+            "-DEIGEN_AVOID_STL_ARRAY",
+            "-Wno-sign-compare",
+            "-ftemplate-depth=900",
+        ] + if_cuda(["-DGOOGLE_CUDA=1"]) +
+        if_nvcc(["-DTENSORFLOW_USE_NVCC=1"]) +
+        if_x86_mode(["-msse3"]) +
+        (["-fno-exceptions"] if not allow_exceptions else []) +
+        ["-pthread"]
+    )
 
-def apollo_gpu_library(deps = None, cuda_deps = None, copts = [], **kwargs):  #apollo_copts()
+def apollo_gpu_library(deps = None, cuda_deps = None, copts = apollo_copts(), **kwargs):
     """Generate a cc_library with a conditional set of CUDA dependencies.
 
       When the library is built with --config=cuda:
@@ -113,7 +115,44 @@ def apollo_gpu_library(deps = None, cuda_deps = None, copts = [], **kwargs):  #a
 def apollo_cuda_library(*args, **kwargs):
     apollo_gpu_library(*args, **kwargs)
 
-def apollo_gpu_binary(deps = None, cuda_deps = None, copts = [], **kwargs):  #apollo_copts()
+def _cuda_copts(opts = []):
+    """Gets the appropriate set of copts for (maybe) CUDA compilation.
+
+        If we're doing CUDA compilation, returns copts for our particular CUDA
+        compiler.  If we're not doing CUDA compilation, returns an empty list.
+
+        """
+    return select({
+        "//conditions:default": [],
+        "@local_config_cuda//cuda:using_nvcc": ([
+            "-nvcc_options=relaxed-constexpr",
+            "-nvcc_options=ftz=true",
+        ]),
+        "@local_config_cuda//cuda:using_clang": ([
+            "-fcuda-flush-denormals-to-zero",
+        ]),
+    }) + if_cuda_is_configured_compat(opts)
+
+def apollo_gpu_kernel_library(
+        srcs,
+        copts = [],
+        cuda_copts = [],
+        deps = [],
+        hdrs = [],
+        **kwargs):
+    copts = copts + apollo_copts() + _cuda_copts(opts = cuda_copts)
+    kwargs["features"] = kwargs.get("features", []) + ["-use_header_modules"]
+
+    cuda_library(
+        srcs = srcs,
+        hdrs = hdrs,
+        copts = copts,
+        deps = deps,
+        alwayslink = 1,
+        **kwargs
+    )
+
+def apollo_gpu_binary(deps = None, cuda_deps = None, copts = apollo_copts(), **kwargs):
     """Generate a cc_binary with a conditional set of CUDA dependencies.
       When the binary is built with --config=cuda:
       Args:
