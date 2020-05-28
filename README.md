@@ -29,8 +29,11 @@ As of Fri May 22 22:22:59 CST 2020, this project is still a Work-In-Progress, wi
 - [gemmlowp](https://github.com/google/gemmlowp)
 - [mkl](https://software.intel.com/content/www/us/en/develop/tools/math-kernel-library.html)
 - nccl
-- tensorflow/workspace.bzl
+
+### Clues
+- TF: third_party/mlir/tblgen.bzl
+- TF: tensorflow/workspace.bzl
+- TF: tensorflow/tensorflow.bzl
 
 ## Welcome on board with Bazel~
-
 
