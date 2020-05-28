@@ -34,6 +34,7 @@ As of Fri May 22 22:22:59 CST 2020, this project is still a Work-In-Progress, wi
 - TF: third_party/mlir/tblgen.bzl
 - TF: tensorflow/workspace.bzl
 - TF: tensorflow/tensorflow.bzl
+- Using Starlark Debugger: https://github.com/bazelbuild/vscode-bazel#using-the-starlark-debugger
 
 ## Welcome on board with Bazel~
 

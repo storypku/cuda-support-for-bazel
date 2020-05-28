@@ -27,6 +27,10 @@ DESCRIPTION:
   as is as a string to --compiler-options of nvcc. When "-x cuda" is not
   present, this wrapper invokes hybrid_driver_is_not_gcc with the input
   arguments as is.
+
+NOTES(storypku): Move this file to
+    //tools/crosstool/crosstool_wrapper_is_not_gcc ?
+
 """
 
 from __future__ import print_function
@@ -50,6 +54,7 @@ NVCC_VERSION = '%{cuda_version}'
 
 def Log(s):
   print('//tools/crosstool: {0}'.format(s))
+
 
 def GetOptionValue(argv, option):
   """Extract the list of values for option from the argv list.
@@ -217,8 +222,12 @@ def InvokeNvcc(argv, log=False):
   nvccopts = '-D_FORCE_INLINES '
   for capability in GetOptionValue(argv, "--cuda-gpu-arch"):
     capability = capability[len('sm_'):]
-    nvccopts += r'-gencode=arch=compute_%s,\"code=sm_%s,compute_%s\" ' % (
-        capability, capability, capability)
+    nvccopts += r'-gencode=arch=compute_%s,\"code=sm_%s\" ' % (capability,
+                                                               capability)
+  for capability in GetOptionValue(argv, '--cuda-include-ptx'):
+    capability = capability[len('sm_'):]
+    nvccopts += r'-gencode=arch=compute_%s,\"code=compute_%s\" ' % (capability,
+                                                                    capability)
   nvccopts += nvcc_compiler_options
   nvccopts += undefines
   nvccopts += defines
@@ -250,6 +259,7 @@ def InvokeNvcc(argv, log=False):
   cmd = 'PATH=' + PREFIX_DIR + ':$PATH ' + cmd
   if log: Log(cmd)
   return system(cmd)
+
 
 def main():
   parser = ArgumentParser()

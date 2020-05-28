@@ -254,7 +254,7 @@ def _nologo():
     return flag_group(flags = ["/nologo"])
 
 def _features(cpu, compiler, ctx):
-    if (cpu != "local"):
+    if cpu != "local":
         fail("Oops, we have tailored cc_toolchain_config.bzl to support Linux ONLY")
 
     return [
@@ -457,6 +457,11 @@ def _features(cpu, compiler, ctx):
                 flag_set(
                     actions = all_link_actions(),
                     flag_groups = [
+                        flag_group(flags = (
+                            ["-Wl,-no-as-needed"] if cpu == "local" else []
+                        ) + [
+                            "-B" + ctx.attr.linker_bin_path,
+                        ]),
                         flag_group(
                             flags = ["@%{linker_param_file}"],
                             expand_if_available = "linker_param_file",
@@ -481,7 +486,7 @@ def _features(cpu, compiler, ctx):
                                 "-Wl,-rpath,@loader_path/%{runtime_library_search_directories}",
                             ],
                         ),
-                        _libraries_to_link_group("darwin" if cpu == "darwin" else "linux"),
+                        _libraries_to_link_group("linux"),
                         _iterate_flag_group(
                             flags = ["%{user_link_flags}"],
                             iterate_over = "user_link_flags",
@@ -494,7 +499,7 @@ def _features(cpu, compiler, ctx):
                             flags = ["-Wl,-S"],
                             expand_if_available = "strip_debug_symbols",
                         ),
-                        flag_group(flags = ["-lc++" if cpu == "darwin" else "-lstdc++"]),
+                        flag_group(flags = ["-lstdc++"]),
                         _no_canonical_prefixes_group(
                             ctx.attr.extra_no_canonical_prefixes_flags,
                         ),
@@ -511,27 +516,18 @@ def _features(cpu, compiler, ctx):
                         "-Wl,-z,relro,-z,now",
                     ])],
                 ),
-            ] if cpu == "local" else []) + [
-                flag_set(
-                    actions = all_link_actions(),
-                    flag_groups = [flag_group(flags = ["-Wl,-no-as-needed"])],
-                    with_features = [with_feature_set(features = ["alwayslink"])],
-                ),
+            ] if cpu == "local" else []) + ([
                 flag_set(
                     actions = all_link_actions(),
                     flag_groups = [
-                        flag_group(flags = ["-B" + ctx.attr.linker_bin_path]),
+                        flag_group(flags = ["-Wl,--gc-sections"]),
+                        flag_group(
+                            flags = ["-Wl,--build-id=md5", "-Wl,--hash-style=gnu"],
+                        ),
                     ],
                 ),
-            ] + ([flag_set(
-                actions = all_link_actions(),
-                flag_groups = [
-                    flag_group(flags = ["-Wl,--gc-sections"]),
-                    flag_group(
-                        flags = ["-Wl,--build-id=md5", "-Wl,--hash-style=gnu"],
-                    ),
-                ],
-            )] if cpu == "local" else []) + _cuda_set(
+            ] if cpu == "local" else []) +
+            _cuda_set(
                 ctx.attr.cuda_path,
                 all_link_actions(),
             ) + [
@@ -543,7 +539,6 @@ def _features(cpu, compiler, ctx):
                 ),
             ],
         ),
-        feature(name = "alwayslink", enabled = cpu == "local"),
         feature(name = "opt"),
         feature(name = "fastbuild"),
         feature(name = "dbg"),
