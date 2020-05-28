@@ -1081,14 +1081,16 @@ _ENVIRONS = [
     "TF_CUDA_PATHS",
 ]
 
-remote_cuda_configure = repository_rule(
-    implementation = _create_local_cuda_repository,
-    environ = _ENVIRONS,
-    remotable = True,
-    attrs = {
-        "environ": attr.string_dict(),
-    },
-)
+# Note(storypku): Uncomment the following rule iff "--experimental_repo_remote_exec"
+# is enabled in //tools/bazelrc
+#remote_cuda_configure = repository_rule(
+#    implementation = _create_local_cuda_repository,
+#    environ = _ENVIRONS,
+#    remotable = True,
+#    attrs = {
+#        "environ": attr.string_dict(),
+#    },
+#)
 
 cuda_configure = repository_rule(
     implementation = _cuda_autoconf_impl,
