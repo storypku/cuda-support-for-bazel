@@ -788,8 +788,8 @@ def set_tf_cuda_compute_capabilities(environ_cp):
             ' note that each additional compute '
             'capability significantly increases your '
             'build time and binary size, and that '
-            'TensorFlow only supports compute '
-            'capabilities >= 3.5 [Default is: %s]: ' %
+            'we only supports compute '
+            'capabilities >= 5.0 [Default is: %s]: ' %
             default_cuda_compute_capabilities)
         tf_cuda_compute_capabilities = get_from_env_or_user_or_default(
             environ_cp, 'TF_CUDA_COMPUTE_CAPABILITIES',
@@ -807,9 +807,9 @@ def set_tf_cuda_compute_capabilities(environ_cp):
                 all_valid = False
             else:
                 ver = float(m.group(0))
-                if ver < 3.0:
+                if ver < 5.0:
                     print(
-                        'ERROR: TensorFlow only supports CUDA compute capabilities 3.0 '
+                        'ERROR: We only supports CUDA compute capabilities 5.0 '
                         'and higher. Please re-specify the list of compute '
                         'capabilities excluding version %s.' % ver)
                     all_valid = False

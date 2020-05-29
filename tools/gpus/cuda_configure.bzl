@@ -18,7 +18,7 @@
   * `CUDNN_INSTALL_PATH` (deprecated): The path to the cuDNN library. Default is
     `/usr/local/cuda`.
   * `TF_CUDA_COMPUTE_CAPABILITIES`: The CUDA compute capabilities. Default is
-    `6.0,6.1,7.0,7.5`
+    `6.0,6.1,7.0,7.2,7.5`
   * `PYTHON_BIN_PATH`: The python binary path
 """
 
@@ -574,8 +574,8 @@ def _file(repository_ctx, label):
 
 _DUMMY_CROSSTOOL_BZL_FILE = """
 def error_gpu_disabled():
-  fail("ERROR: Building with --config=cuda but TensorFlow is not configured " +
-       "to build with GPU support. Please re-run ./configure and enter 'Y' " +
+  fail("ERROR: Building with --config=cuda but not configured " +
+       "to build with GPU support. Please re-run ./bootstrap.sh and enter 'Y' " +
        "at the prompt to build with GPU support.")
 
   native.genrule(

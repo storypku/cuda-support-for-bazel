@@ -21,6 +21,7 @@ The editor also adjusted default CUDA compute capability settings. Only newer NV
 As of Fri May 29 08:12:47 CST 2020, this project is still a Work-In-Progress, with a few bugs to be fixed.
 - TensorRT support was not tailored yet
 - NCCL support was not tailored yet.
+- https://github.com/tensorflow/tensorflow/issues/39759
 
 ### Stripped Modules/Dependencies/Options
 - [gemmlowp](https://github.com/google/gemmlowp)
