@@ -1,3 +1,4 @@
+# This file was adapted from third_party/remote_config/common.bzl in tensorflow.git
 """Functions common across configure rules."""
 
 BAZEL_SH = "BAZEL_SH"

@@ -1,5 +1,3 @@
 learn-cuda.git
-llvim.git
-hibbert-pku
 tools/nccl
 tools/tensorrt

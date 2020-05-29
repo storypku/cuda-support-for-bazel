@@ -1,7 +1,7 @@
 workspace(name = "storydev")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("//tools:cuda_configure.bzl", "cuda_configure")
+load("//tools/gpus:cuda_configure.bzl", "cuda_configure")
 
 cuda_configure(name = "local_config_cuda")
 

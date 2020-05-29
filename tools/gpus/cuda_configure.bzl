@@ -28,7 +28,7 @@ load(
     "get_env_var",
 )
 load(
-    "//tools:common.bzl",
+    "//tools/platform:common.bzl",
     "config_repo_label",
     "err_out",
     "execute",
@@ -757,7 +757,7 @@ def _compute_cuda_extra_copts(repository_ctx, compute_capabilities):
     return str(capability_flags)
 
 def _tpl_path(repository_ctx, filename):
-    return repository_ctx.path(Label("//tools/%s.tpl" % filename))
+    return repository_ctx.path(Label("//tools/gpus/%s.tpl" % filename))
 
 def _basename(repository_ctx, path_str):
     """Returns the basename of a path of type string.
@@ -785,7 +785,7 @@ def _create_local_cuda_repository(repository_ctx):
     ]}
     tpl_paths["cuda:BUILD"] = _tpl_path(repository_ctx, "cuda:BUILD")
 
-    find_cuda_config_script = repository_ctx.path(Label("//tools:find_cuda_config.py.gz.base64"))
+    find_cuda_config_script = repository_ctx.path(Label("//tools/gpus:find_cuda_config.py.gz.base64"))
 
     cuda_config = _get_cuda_config(repository_ctx, find_cuda_config_script)
 
@@ -832,7 +832,7 @@ def _create_local_cuda_repository(repository_ctx):
         ],
     ))
 
-    check_cuda_libs_script = repository_ctx.path(Label("@storydev//tools:check_cuda_libs.py"))
+    check_cuda_libs_script = repository_ctx.path(Label("@storydev//tools/gpus:check_cuda_libs.py"))
     cuda_libs = _find_libs(repository_ctx, check_cuda_libs_script, cuda_config)
     cuda_lib_srcs = []
     cuda_lib_outs = []
