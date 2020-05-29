@@ -57,5 +57,5 @@ bazel run //src:hello_world
 
 TODO(storypku): More examples, esp. shared library use cases.
 
-## Welcome on board with Bazel~
+## Welcome On Board with Bazel!
 
