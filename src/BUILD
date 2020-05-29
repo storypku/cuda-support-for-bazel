@@ -1,9 +1,9 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
-load("//tools:storydev.bzl", "storydev_gpu_library")
 load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
+load("//tools:storydev.bzl", "storydev_gpu_library", "storydev_kernel_library")
 
 cuda_library(
-    name = "hello_world_gpu_lib",
+    name = "hello_world_cuda_lib",
     srcs = ["hello_world.cu"],
     deps = [
         "@local_config_cuda//cuda:cudart",
@@ -13,12 +13,12 @@ cuda_library(
 cc_binary(
     name = "hello_world",
     deps = [
-        ":hello_world_gpu_lib",
+        ":hello_world_cuda_lib",
     ],
 )
 
 storydev_gpu_library(
-    name = "hello_world_agpu_lib",
+    name = "hello_world_gpu_lib",
     srcs = ["hello_world.cu"],
     deps = [
         "@local_config_cuda//cuda:cudart",
@@ -26,8 +26,23 @@ storydev_gpu_library(
 )
 
 cc_binary(
-    name = "hello_world2",
+    name = "hello_world_gpu",
     deps = [
-        ":hello_world_agpu_lib",
+        ":hello_world_gpu_lib",
+    ],
+)
+
+storydev_kernel_library(
+    name = "hello_world_kernel_lib",
+    srcs = ["hello_world.cu"],
+    deps = [
+        "@local_config_cuda//cuda:cudart",
+    ],
+)
+
+cc_binary(
+    name = "hello_world_kernel",
+    deps = [
+        ":hello_world_kernel_lib",
     ],
 )

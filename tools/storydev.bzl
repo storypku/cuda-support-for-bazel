@@ -164,82 +164,6 @@ def _make_search_paths(prefix, levels_to_root):
         ],
     )
 
-def _rpath_linkopts(name):
-    # Search parent directories up to the StoryDev root directory for shared
-    # object dependencies, even if this shared object is deeply nested
-    levels_to_root = native.package_name().count("/") + name.count("/")
-    return ["-Wl,%s" % (_make_search_paths("$$ORIGIN", levels_to_root))]
-
-# TODO(pcloudy): Remove this workaround when https://github.com/bazelbuild/bazel/issues/4570
-# is done and cc_shared_library is available.
-# On Linux, shared libraries are usually named as libfoo.so
-LINUX_SHARED_LIBRARY_NAME_PATTERN = "lib%s.so%s"
-
-def storydev_cc_shared_object(
-        name,
-        srcs = [],
-        deps = [],
-        data = [],
-        linkopts = lrt_if_needed(),
-        soversion = None,
-        kernels = [],
-        visibility = None,
-        **kwargs):
-    """Configure the shared object (.so) file for StoryDev."""
-    if soversion != None:
-        suffix = "." + str(soversion).split(".")[0]
-        longsuffix = "." + str(soversion)
-    else:
-        suffix = ""
-        longsuffix = ""
-
-    #linux_pattern = LINUX_SHARED_LIBRARY_NAME_PATTERN
-    #name_on_linux = (
-    #    linux_pattern % (name, ""),
-    #    linux_pattern % (name, suffix),
-    #    linux_pattern % (name, longsuffix),
-    #)
-    name_on_linux = (name, name + suffix, name + longsuffix)
-    (name_os, name_os_major, name_os_full) = name_on_linux
-    if name_os != name_os_major:
-        native.genrule(
-            name = name_os + "_sym",
-            outs = [name_os],
-            srcs = [name_os_major],
-            output_to_bindir = 1,
-            cmd = "ln -sf $$(basename $<) $@",
-        )
-        native.genrule(
-            name = name_os_major + "_sym",
-            outs = [name_os_major],
-            srcs = [name_os_full],
-            output_to_bindir = 1,
-            cmd = "ln -sf $$(basename $<) $@",
-        )
-
-    soname = name_os_major.split("/")[-1]
-
-    cc_binary(
-        name = name_os_full,
-        srcs = srcs,
-        deps = deps,
-        linkshared = 1,
-        data = data,
-        linkopts = linkopts + _rpath_linkopts(name_os_full) + [
-            "-Wl,-soname," + soname,
-        ],
-        visibility = visibility,
-        **kwargs
-    )
-
-    flattened_names = list(name_on_linux)
-    if name not in flattened_names:
-        native.filegroup(
-            name = name,
-            srcs = [":lib%s.so%s" % (name, longsuffix)],
-            visibility = visibility,
-        )
-
 def storydev_kernel_library(
         name,
         prefix = None,
@@ -335,12 +259,4 @@ def storydev_kernel_library(
         alwayslink = alwayslink,
         deps = deps,
         **kwargs
-    )
-
-    # TODO(gunan): CUDA dependency not clear here. Fix it.
-    storydev_cc_shared_object(
-        name = "liback_%s.so" % name,
-        srcs = srcs + hdrs,
-        copts = copts,
-        deps = deps,
     )
