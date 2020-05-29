@@ -1,4 +1,5 @@
 #! /usr/bin/env python3
+# Adapted from tensorflow.git/configure.py
 # Copyright 2017 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,13 +37,12 @@ except ImportError:
 
 _DEFAULT_CUDA_VERSION = '10'
 _DEFAULT_CUDNN_VERSION = '7'
-_DEFAULT_TENSORRT_VERSION = '6'
+_DEFAULT_TENSORRT_VERSION = '7'
 _DEFAULT_CUDA_COMPUTE_CAPABILITIES = '3.5,7.0'
 
 _TF_OPENCL_VERSION = '1.2'
 _DEFAULT_COMPUTECPP_TOOLKIT_PATH = '/usr/local/computecpp'
 _DEFAULT_TRISYCL_INCLUDE_DIR = '/usr/local/triSYCL/include'
-_SUPPORTED_ANDROID_NDK_VERSIONS = [10, 11, 12, 13, 14, 15, 16, 17, 18]
 
 _DEFAULT_PROMPT_ASK_ATTEMPTS = 10
 
@@ -55,43 +55,13 @@ _TF_MAX_BAZEL_VERSION = '3.99.0'
 
 NCCL_LIB_PATHS = ['lib64/', 'lib/x86_64-linux-gnu/', '']
 
-# List of files to configure when building Bazel on Apple platforms.
-APPLE_BAZEL_FILES = [
-    'tensorflow/lite/experimental/ios/BUILD',
-    'tensorflow/lite/experimental/objc/BUILD',
-    'tensorflow/lite/experimental/swift/BUILD',
-    'tensorflow/lite/tools/benchmark/experimental/ios/BUILD'
-]
-
-# List of files to move when building for iOS.
-IOS_FILES = [
-    'tensorflow/lite/experimental/objc/TensorFlowLiteObjC.podspec',
-    'tensorflow/lite/experimental/swift/TensorFlowLiteSwift.podspec',
-]
-
 
 class UserInputError(Exception):
     pass
 
 
-def is_windows():
-    return platform.system() == 'Windows'
-
-
 def is_linux():
     return platform.system() == 'Linux'
-
-
-def is_macos():
-    return platform.system() == 'Darwin'
-
-
-def is_ppc64le():
-    return platform.machine() == 'ppc64le'
-
-
-def is_cygwin():
-    return platform.system().startswith('CYGWIN_NT')
 
 
 def get_input(question):
@@ -159,11 +129,6 @@ def run_shell(cmd, allow_non_zero=False, stderr=None):
     return output.decode('UTF-8').strip()
 
 
-def cygpath(path):
-    """Convert path from posix to windows."""
-    return os.path.abspath(path).replace('\\', '/')
-
-
 def get_python_path(environ_cp, python_bin_path):
     """Get the python site package paths."""
     python_paths = []
@@ -224,10 +189,6 @@ def setup_python(environ_cp):
                 python_bin_path))
         environ_cp['PYTHON_BIN_PATH'] = ''
 
-    # Convert python path to Windows style before checking lib and version
-    if is_windows() or is_cygwin():
-        python_bin_path = cygpath(python_bin_path)
-
     # Get PYTHON_LIB_PATH
     python_lib_path = environ_cp.get('PYTHON_LIB_PATH')
     if not python_lib_path:
@@ -246,12 +207,11 @@ def setup_python(environ_cp):
         environ_cp['PYTHON_LIB_PATH'] = python_lib_path
 
     python_major_version = get_python_major_version(python_bin_path)
-    if python_major_version == '2':
-        write_to_bazelrc('build --host_force_python=PY2')
-
-    # Convert python path to Windows style before writing into bazel.rc
-    if is_windows() or is_cygwin():
-        python_lib_path = cygpath(python_lib_path)
+    if python_major_version != '3':
+        print(
+            "Python 2 has been RETIRED since April 2020. Use Python 3 instead."
+        )
+        sys.exit(1)
 
     # Set-up env variables used by python_configure.bzl
     write_action_env_to_bazelrc('PYTHON_BIN_PATH', python_bin_path)
@@ -277,20 +237,6 @@ def setup_python(environ_cp):
 def reset_tf_configure_bazelrc():
     """Reset file that contains customized config settings."""
     open(_TF_BAZELRC, 'w').close()
-
-
-def cleanup_makefile():
-    """Delete any leftover BUILD files from the Makefile build.
-
-  These files could interfere with Bazel parsing.
-  """
-    makefile_download_dir = os.path.join(_TF_WORKSPACE_ROOT, 'tensorflow',
-                                         'contrib', 'makefile', 'downloads')
-    if os.path.isdir(makefile_download_dir):
-        for root, _, filenames in os.walk(makefile_download_dir):
-            for f in filenames:
-                if f.endswith('BUILD'):
-                    os.remove(os.path.join(root, f))
 
 
 def get_var(environ_cp,
@@ -477,13 +423,13 @@ def convert_version_to_int(version):
 def check_bazel_version(min_version, max_version):
     """Check installed bazel version is between min_version and max_version.
 
-  Args:
-    min_version: string for minimum bazel version (must exist!).
-    max_version: string for maximum bazel version (must exist!).
+    Args:
+        min_version: string for minimum bazel version (must exist!).
+        max_version: string for maximum bazel version (must exist!).
 
-  Returns:
-    The bazel version detected.
-  """
+    Returns:
+        The bazel version detected.
+    """
     if which('bazel') is None:
         print('Cannot find bazel. Please install bazel.')
         sys.exit(0)
@@ -530,13 +476,7 @@ def set_cc_opt_flags(environ_cp):
   Args:
     environ_cp: copy of the os.environ.
   """
-    if is_ppc64le():
-        # gcc on ppc64le does not support -march, use mcpu instead
-        default_cc_opt_flags = '-mcpu=native'
-    elif is_windows():
-        default_cc_opt_flags = '/arch:AVX'
-    else:
-        default_cc_opt_flags = '-march=native -Wno-sign-compare'
+    default_cc_opt_flags = '-march=native'
     question = (
         'Please specify optimization flags to use during compilation when'
         ' bazel option "--config=opt" is specified [Default is %s]: '
@@ -546,8 +486,7 @@ def set_cc_opt_flags(environ_cp):
     for opt in cc_opt_flags.split():
         write_to_bazelrc('build:opt --copt=%s' % opt)
     # It should be safe on the same build host.
-    if not is_ppc64le() and not is_windows():
-        write_to_bazelrc('build:opt --host_copt=-march=native')
+    write_to_bazelrc('build:opt --host_copt=-march=native')
     write_to_bazelrc('build:opt --define with_default_optimizations=true')
 
 
@@ -716,8 +655,7 @@ def set_gcc_host_compiler_path(environ_cp):
         environ_cp,
         var_name='GCC_HOST_COMPILER_PATH',
         var_default=default_gcc_host_compiler_path,
-        ask_for_var=
-        'Please specify which gcc should be used by nvcc as the host compiler.',
+        ask_for_var='Please specify which gcc should be used by nvcc as the host compiler.',
         check_success=os.path.exists,
         resolve_symlinks=True,
         error_msg='Invalid gcc path. %s cannot be found.',
@@ -813,10 +751,6 @@ def is_cuda_compatible(lib, cuda_ver, cudnn_ver):
 
 def set_tf_tensorrt_version(environ_cp):
     """Set TF_TENSORRT_VERSION."""
-    if not is_linux():
-        raise ValueError(
-            'Currently TensorRT is only supported on Linux platform.')
-
     if not int(environ_cp.get('TF_NEED_TENSORRT', False)):
         return
 
@@ -832,9 +766,6 @@ def set_tf_tensorrt_version(environ_cp):
 
 def set_tf_nccl_version(environ_cp):
     """Set TF_NCCL_VERSION."""
-    if not is_linux():
-        raise ValueError('Currently NCCL is only supported on Linux platform.')
-
     if 'TF_NCCL_VERSION' in environ_cp:
         return
 
@@ -982,10 +913,7 @@ def set_computecpp_toolkit_path(environ_cp):
 
     def toolkit_exists(toolkit_path):
         """Check if a computecpp toolkit path is valid."""
-        if is_linux():
-            sycl_rt_lib_path = 'lib/libComputeCpp.so'
-        else:
-            sycl_rt_lib_path = ''
+        sycl_rt_lib_path = 'lib/libComputeCpp.so'
 
         sycl_rt_lib_path_full = os.path.join(toolkit_path, sycl_rt_lib_path)
         exists = os.path.exists(sycl_rt_lib_path_full)
@@ -1047,33 +975,12 @@ def system_specific_test_config(environ_cp):
     # Additional filters for --test_tag_filters beyond those in
     # test_and_build_filters
     test_only_filters = ['-oss_serial']
-    if is_windows():
-        test_and_build_filters.append('-no_windows')
-        if ((environ_cp.get('TF_NEED_CUDA', None) == '1')
-                or (environ_cp.get('TF_NEED_ROCM', None) == '1')):
-            test_and_build_filters += ['-no_windows_gpu', '-no_gpu']
-        else:
-            test_and_build_filters.append('-gpu')
-    elif is_macos():
-        test_and_build_filters += ['-gpu', '-nomac', '-no_mac']
-    elif is_linux():
-        if ((environ_cp.get('TF_NEED_CUDA', None) == '1')
-                or (environ_cp.get('TF_NEED_ROCM', None) == '1')):
-            test_and_build_filters.append('-no_gpu')
-            write_to_bazelrc('test --test_env=LD_LIBRARY_PATH')
-        else:
-            test_and_build_filters.append('-gpu')
-
-    # Disable tests with "v1only" tag in "v2" Bazel config, but not in "v1" config
-    write_to_bazelrc('test:v1 --test_tag_filters=%s' %
-                     ','.join(test_and_build_filters + test_only_filters))
-    write_to_bazelrc(
-        'test:v1 --build_tag_filters=%s' % ','.join(test_and_build_filters))
-    write_to_bazelrc(
-        'test:v2 --test_tag_filters=%s' %
-        ','.join(test_and_build_filters + test_only_filters + ['-v1only']))
-    write_to_bazelrc('test:v2 --build_tag_filters=%s' %
-                     ','.join(test_and_build_filters + ['-v1only']))
+    if ((environ_cp.get('TF_NEED_CUDA', None) == '1')
+            or (environ_cp.get('TF_NEED_ROCM', None) == '1')):
+        test_and_build_filters.append('-no_gpu')
+        write_to_bazelrc('test --test_env=LD_LIBRARY_PATH')
+    else:
+        test_and_build_filters.append('-gpu')
 
 
 def set_system_libs_flag(environ_cp):
@@ -1122,49 +1029,9 @@ def is_reduced_optimize_huge_functions_available(environ_cp):
     return float(environ_cp.get('TF_VC_VERSION', '0')) >= 16.4
 
 
-def set_windows_build_flags(environ_cp):
-    """Set Windows specific build options."""
-    if is_reduced_optimize_huge_functions_available(environ_cp):
-        write_to_bazelrc(
-            'build --copt=/d2ReducedOptimizeHugeFunctions --host_copt=/d2ReducedOptimizeHugeFunctions'
-        )
-
-    if get_var(environ_cp, 'TF_OVERRIDE_EIGEN_STRONG_INLINE',
-               'Eigen strong inline', True,
-               ('Would you like to override eigen strong inline for some C++ '
-                'compilation to reduce the compilation time?'),
-               'Eigen strong inline overridden.',
-               'Not overriding eigen strong inline, '
-               'some compilations could take more than 20 mins.'):
-        # Due to a known MSVC compiler issue
-        # https://github.com/tensorflow/tensorflow/issues/10521
-        # Overriding eigen strong inline speeds up the compiling of
-        # conv_grad_ops_3d.cc and conv_ops_3d.cc by 20 minutes,
-        # but this also hurts the performance. Let users decide what they want.
-        write_to_bazelrc('build --define=override_eigen_strong_inline=true')
-
-
 def config_info_line(name, help_text):
     """Helper function to print formatted help text for Bazel config options."""
     print('\t--config=%-12s\t# %s' % (name, help_text))
-
-
-def configure_ios():
-    """Configures TensorFlow for iOS builds.
-
-  This function will only be executed if `is_macos()` is true.
-  """
-    if not is_macos():
-        return
-    for filepath in APPLE_BAZEL_FILES:
-        existing_filepath = os.path.join(_TF_WORKSPACE_ROOT,
-                                         filepath + '.apple')
-        renamed_filepath = os.path.join(_TF_WORKSPACE_ROOT, filepath)
-        symlink_force(existing_filepath, renamed_filepath)
-    for filepath in IOS_FILES:
-        filename = os.path.basename(filepath)
-        new_filepath = os.path.join(_TF_WORKSPACE_ROOT, filename)
-        symlink_force(filepath, new_filepath)
 
 
 def validate_cuda_config(environ_cp):
@@ -1172,7 +1039,7 @@ def validate_cuda_config(environ_cp):
 
     def maybe_encode_env(env):
         """Encodes unicode in env to str on Windows python 2.x."""
-        if not is_windows() or sys.version_info[0] != 2:
+        if sys.version_info[0] != 2:
             return env
         for k, v in env.items():
             if isinstance(k, unicode):
@@ -1183,11 +1050,10 @@ def validate_cuda_config(environ_cp):
         return env
 
     cuda_libraries = ['cuda', 'cudnn']
-    if is_linux():
-        if int(environ_cp.get('TF_NEED_TENSORRT', False)):
-            cuda_libraries.append('tensorrt')
-        if environ_cp.get('TF_NCCL_VERSION', None):
-            cuda_libraries.append('nccl')
+    if int(environ_cp.get('TF_NEED_TENSORRT', False)):
+        cuda_libraries.append('tensorrt')
+    if environ_cp.get('TF_NCCL_VERSION', None):
+        cuda_libraries.append('nccl')
 
     proc = subprocess.Popen(
         [environ_cp['PYTHON_BIN_PATH'], 'tools/gpus/find_cuda_config.py'] +
@@ -1228,7 +1094,17 @@ def validate_cuda_config(environ_cp):
     return True
 
 
+def default_workspace_directory():
+    current_dir = os.path.dirname(__file__)
+    if len(current_dir) == 0:
+        current_dir = "."
+    return os.path.abspath(current_dir + "/..")
+
+
 def main():
+    if not is_linux():
+        raise ValueError("Currently ONLY Linux platform is supported.")
+
     global _TF_WORKSPACE_ROOT
     global _TF_BAZELRC
     global _TF_CURRENT_BAZEL_VERSION
@@ -1237,7 +1113,7 @@ def main():
     parser.add_argument(
         '--workspace',
         type=str,
-        default=os.path.abspath(os.path.dirname(__file__)),
+        default=default_workspace_directory(),
         help='The absolute path to your active Bazel workspace.')
     args = parser.parse_args()
 
@@ -1260,7 +1136,6 @@ def main():
 
     reset_tf_configure_bazelrc()
 
-    cleanup_makefile()
     setup_python(environ_cp)
 
     environ_cp['TF_CONFIGURE_IOS'] = '0'
@@ -1284,15 +1159,15 @@ def main():
         else:
             set_trisycl_include_dir(environ_cp)
 
-    #set_action_env_var(
+    # set_action_env_var(
     #    environ_cp, 'TF_NEED_ROCM', 'ROCm', False, bazel_config_name='rocm')
-    #if (environ_cp.get('TF_NEED_ROCM') == '1'
+    # if (environ_cp.get('TF_NEED_ROCM') == '1'
     #        and 'LD_LIBRARY_PATH' in environ_cp
     #        and environ_cp.get('LD_LIBRARY_PATH') != '1'):
     #    write_action_env_to_bazelrc('LD_LIBRARY_PATH',
     #                                environ_cp.get('LD_LIBRARY_PATH'))
 
-    #if (environ_cp.get('TF_NEED_ROCM') == '1' and environ_cp.get('ROCM_PATH')):
+    # if (environ_cp.get('TF_NEED_ROCM') == '1' and environ_cp.get('ROCM_PATH')):
     #    write_action_env_to_bazelrc('ROCM_PATH', environ_cp.get('ROCM_PATH'))
     #    write_action_env_to_bazelrc('ROCM_ROOT', environ_cp.get('ROCM_PATH'))
 
@@ -1338,9 +1213,8 @@ def main():
 
             set_tf_cuda_version(environ_cp)
             set_tf_cudnn_version(environ_cp)
-            if is_linux():
-                set_tf_tensorrt_version(environ_cp)
-                set_tf_nccl_version(environ_cp)
+            set_tf_tensorrt_version(environ_cp)
+            set_tf_nccl_version(environ_cp)
 
             set_tf_cuda_paths(environ_cp)
 

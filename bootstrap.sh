@@ -6,8 +6,7 @@ if [ -z "$PYTHON_BIN_PATH" ]; then
 fi
 
 # Set all env variables
-CONFIGURE_DIR=$(dirname "$0")
-"$PYTHON_BIN_PATH" "${CONFIGURE_DIR}/configure.py" "$@"
+TOP_DIR=$(dirname "$0")
+"$PYTHON_BIN_PATH" "${TOP_DIR}/tools/bootstrap.py" "$@"
 
 echo "Configuration finished"
-
