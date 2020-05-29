@@ -1,5 +1,4 @@
 # This file is adapted from tensorflow.git/tensorflow/tensorflow.bzl
-
 load("//tools/platform:rules_cc.bzl", "cc_binary", "cc_library", "cc_test")
 #load("@local_config_tensorrt//:build_defs.bzl", "if_tensorrt")
 
@@ -101,7 +100,7 @@ def storydev_gpu_library(deps = None, cuda_deps = None, copts = storydev_copts()
         cuda_deps = []
 
     kwargs["features"] = kwargs.get("features", []) + ["-use_header_modules"]
-    cc_library(
+    cuda_library(
         deps = deps + if_cuda_is_configured_compat(cuda_deps + [
             "@local_config_cuda//cuda:cuda_headers",
         ]),
