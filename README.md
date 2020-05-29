@@ -21,14 +21,13 @@ The editor also adjusted default CUDA compute capability settings. Only newer NV
 As of Fri May 29 08:12:47 CST 2020, this project is still a Work-In-Progress, with a few bugs to be fixed.
 - TensorRT support was not tailored yet
 - NCCL support was not tailored yet.
-- https://github.com/tensorflow/tensorflow/issues/39759
 
 ### Stripped Modules/Dependencies/Options
 - [gemmlowp](https://github.com/google/gemmlowp)
 - [mkl](https://software.intel.com/content/www/us/en/develop/tools/math-kernel-library.html)
 - OpenCL
 - [ROCm](https://github.com/RadeonOpenCompute/ROCm)
-- [XLA](https://www.tensorflow.org/xla), Ref: https://developers.googleblog.com/2017/03/xla-tensorflow-compiled.html
+- [XLA](https://www.tensorflow.org/xla)
 - [Intel nGraph support](https://github.com/NervanaSystems/ngraph)
 - Option for experimental clang download
 
@@ -41,20 +40,15 @@ As of Fri May 29 08:12:47 CST 2020, this project is still a Work-In-Progress, wi
 
 ## How to Run
 
-### Step 1: Edit `.storydev.bazelrc` to adjust your Python and CUDA Toolkit versions manually.
-TODO(storypku): Provides a `bootstrap` script to configure this, just like Tensorflow's `configure`.
+#### Step 1: Run `./bootstrap.sh --noninteractive` or `./bootstrap.sh` to configure your bazel build options.
 
-### Step 2: Determine your nVidia GPU's compute capability (abbr. SM), or a list of SMs you want to support. And perform a **find-and-replace** operation in this REPO.
-
-TODO(storypku): Check and set SM values (E.g., `sm_61`, `compute_61`) when running `bootstrap`.
-
-### Step 3: Install Bazel 3.0+.
-
+#### Step 2: Install Bazel 3.0+.
 Ref: [GitHub Bazel Release Page](https://github.com/bazelbuild/bazel/releases)
 
 The following was tested on an Ubuntu 18.04 x86_64 machine with NVidia GTX 1070, using Bazel 3.2.0.
 
-### Step 4: Run the `hello-world` example to check if everything works fine.
+#### Step 3: Run the `hello-world` example to check if everything works fine.
+
 ```
 bazel run //src:hello_world
 ```
