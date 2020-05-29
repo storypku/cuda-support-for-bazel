@@ -15,3 +15,18 @@ cc_binary(
         ":hello_world_gpu_lib",
     ],
 )
+
+cuda_library(
+    name = "vector_add_gpu_lib",
+    srcs = ["vector_add.cu"],
+    deps = [
+        "@local_config_cuda//cuda:cudart",
+    ],
+)
+
+cc_binary(
+    name = "vector_add",
+    deps = [
+        ":vector_add_gpu_lib",
+    ],
+)
