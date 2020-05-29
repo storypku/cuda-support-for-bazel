@@ -1,7 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 #buildifier: @unused
-load("//tools:apollo.bzl", "apollo_gpu_library")
+load("//tools:storydev.bzl", "storydev_gpu_library")
 load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 
 cuda_library(
@@ -23,7 +23,7 @@ cc_binary(
     ],
 )
 
-#apollo_gpu_library(
+#storydev_gpu_library(
 #    name = "hello_world_agpu_lib",
 #    srcs = ["hello_world.cu"],
 #    deps = [

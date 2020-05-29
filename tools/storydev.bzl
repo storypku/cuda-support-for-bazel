@@ -13,7 +13,7 @@ load(
 # placeholder for mkl, Intel Math Kernel Library
 
 # Sanitize a dependency so that it works correctly from code that includes
-# Apollo as a submodule.
+# StoryDev as a submodule.
 def clean_dep(dep):
     return str(Label(dep))
 
@@ -51,33 +51,33 @@ def lrt_if_needed():
         "//conditions:default": [],
     })
 
-#def apollo_opts_nortti():
+#def storydev_opts_nortti():
 #return [
 #    "-fno-rtti",
 #    "-DGOOGLE_PROTOBUF_NO_RTTI",
 #    "-DGOOGLE_PROTOBUF_NO_STATIC_INITIALIZER",
 #]
-#def apollo_defines_nortti():
+#def storydev_defines_nortti():
 #    return [
 #        "GOOGLE_PROTOBUF_NO_RTTI",
 #        "GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER",
 #    ]
 
 # if_tensorrt(["-DGOOGLE_TENSORRT=1"]) +
-def apollo_copts(allow_exceptions = False):
+def storydev_copts(allow_exceptions = False):
     return (
         [
             "-DEIGEN_AVOID_STL_ARRAY",
             "-Wno-sign-compare",
             "-ftemplate-depth=900",
         ] + if_cuda(["-DGOOGLE_CUDA=1"]) +
-        if_nvcc(["-DAPOLLO_USE_NVCC=1"]) +
+        if_nvcc(["-DSTORYDEV_USE_NVCC=1"]) +
         if_x86_mode(["-msse3"]) +
         (["-fno-exceptions"] if not allow_exceptions else []) +
         ["-pthread"]
     )
 
-def apollo_gpu_library(deps = None, cuda_deps = None, copts = apollo_copts(), **kwargs):
+def storydev_gpu_library(deps = None, cuda_deps = None, copts = storydev_copts(), **kwargs):
     """Generate a cc_library with a conditional set of CUDA dependencies.
 
       When the library is built with --config=cuda:
@@ -110,9 +110,9 @@ def apollo_gpu_library(deps = None, cuda_deps = None, copts = apollo_copts(), **
         **kwargs
     )
 
-# terminology interoperability: saving apollo_cuda_* definition for convenience
-def apollo_cuda_library(*args, **kwargs):
-    apollo_gpu_library(*args, **kwargs)
+# terminology interoperability: saving storydev_cuda_* definition for convenience
+def storydev_cuda_library(*args, **kwargs):
+    storydev_gpu_library(*args, **kwargs)
 
 def _cuda_copts(opts = []):
     """Gets the appropriate set of copts for (maybe) CUDA compilation.
@@ -132,14 +132,14 @@ def _cuda_copts(opts = []):
         ]),
     }) + if_cuda_is_configured_compat(opts)
 
-def apollo_gpu_kernel_library(
+def storydev_gpu_kernel_library(
         srcs,
         copts = [],
         cuda_copts = [],
         deps = [],
         hdrs = [],
         **kwargs):
-    copts = copts + apollo_copts() + _cuda_copts(opts = cuda_copts)
+    copts = copts + storydev_copts() + _cuda_copts(opts = cuda_copts)
     kwargs["features"] = kwargs.get("features", []) + ["-use_header_modules"]
 
     cuda_library(
@@ -166,7 +166,7 @@ def _make_search_paths(prefix, levels_to_root):
     )
 
 def _rpath_linkopts(name):
-    # Search parent directories up to the Apollo root directory for shared
+    # Search parent directories up to the StoryDev root directory for shared
     # object dependencies, even if this shared object is deeply nested
     levels_to_root = native.package_name().count("/") + name.count("/")
     return ["-Wl,%s" % (_make_search_paths("$$ORIGIN", levels_to_root))]
@@ -176,7 +176,7 @@ def _rpath_linkopts(name):
 # On Linux, shared libraries are usually named as libfoo.so
 LINUX_SHARED_LIBRARY_NAME_PATTERN = "lib%s.so%s"
 
-def apollo_cc_shared_object(
+def storydev_cc_shared_object(
         name,
         srcs = [],
         deps = [],
@@ -186,7 +186,7 @@ def apollo_cc_shared_object(
         kernels = [],
         visibility = None,
         **kwargs):
-    """Configure the shared object (.so) file for Apollo."""
+    """Configure the shared object (.so) file for StoryDev."""
     if soversion != None:
         suffix = "." + str(soversion).split(".")[0]
         longsuffix = "." + str(soversion)
@@ -241,7 +241,7 @@ def apollo_cc_shared_object(
             visibility = visibility,
         )
 
-def apollo_kernel_library(
+def storydev_kernel_library(
         name,
         prefix = None,
         srcs = None,
@@ -254,7 +254,7 @@ def apollo_kernel_library(
         **kwargs):
     """A rule to build CUDA Kernel.
 
-      May either specify srcs/hdrs or prefix.  Similar to apollo_gpu_library,
+      May either specify srcs/hdrs or prefix.  Similar to storydev_gpu_library,
       but with alwayslink=1 by default.  If prefix is specified:
         * prefix*.cc (except *.cu.cc) is added to srcs
         * prefix*.h (except *.cu.h) is added to hdrs
@@ -284,7 +284,7 @@ def apollo_kernel_library(
     if not gpu_copts:
         gpu_copts = []
     textual_hdrs = []
-    copts = copts + apollo_copts()
+    copts = copts + storydev_copts()
 
     # Override EIGEN_STRONG_INLINE to inline when
     # --define=override_eigen_strong_inline=true to avoid long compiling time.
@@ -316,7 +316,7 @@ def apollo_kernel_library(
             if gpu_src.endswith(".cc") and not gpu_src.endswith(".cu.cc"):
                 fail("{} not allowed in gpu_srcs. .cc sources must end with .cu.cc"
                     .format(gpu_src))
-        apollo_gpu_kernel_library(
+        storydev_gpu_kernel_library(
             name = name + "_gpu",
             srcs = gpu_srcs,
             deps = deps,
@@ -325,7 +325,7 @@ def apollo_kernel_library(
         )
         cuda_deps.extend([":" + name + "_gpu"])
 
-    apollo_gpu_library(
+    storydev_gpu_library(
         name = name,
         srcs = srcs,
         hdrs = hdrs,
@@ -339,7 +339,7 @@ def apollo_kernel_library(
     )
 
     # TODO(gunan): CUDA dependency not clear here. Fix it.
-    apollo_cc_shared_object(
+    storydev_cc_shared_object(
         name = "liback_%s.so" % name,
         srcs = srcs + hdrs,
         copts = copts,

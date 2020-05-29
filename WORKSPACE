@@ -1,4 +1,4 @@
-workspace(name = "apollo")
+workspace(name = "storydev")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("//tools:cuda_configure.bzl", "cuda_configure")

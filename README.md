@@ -11,24 +11,23 @@ The mechanism behind `CUDA support for Bazel` was Bazel's custom toolchain suppo
 
 ## Warnings Ahead
 
-Note that `CUDA support for Bazel` IN THIS REPO was tailored to run on Linux ONLY.
-The "editor" stripped off Windows and MacOS support which are present in the original TensorFlow repo.
+Note that `CUDA Support for Bazel` IN THIS REPO was tailored to run on Linux ONLY. And tailored to support `x86_64` and `aarch64` architectures ONLY for my own need. To add more architecture support, please refer to [Tensorflow](https://github.com/tensorflow/tensorflow.git).
 
-Note also the "editor" adjusted compute capabilies support. Only SM = ["6.0", "6.1", "7.0", "7.2", "7.5"] cards are supported, and requires CUDA version >= 9.0.
+And, Windows and MacOS support are stripped off which are present in the original TensorFlow repo.
+
+Note also that the "editor" adjusted CUDA compute capability support. Only SMs = ["6.0", "6.1", "7.0", "7.2", "7.5"] nVidia GPU cards are supported, and requires CUDA Toolkit version >= 9.0.
 
 ## Status
 
-As of Fri May 22 22:22:59 CST 2020, this project is still a Work-In-Progress, with a few bugs to be fixed.
+As of Fri May 29 08:12:47 CST 2020, this project is still a Work-In-Progress, with a few bugs to be fixed.
 
 - https://github.com/tensorflow/tensorflow/issues/39759
-- `tools/find_cuda_config.py` compress/decompress, see code.
 - TensorRT support was not tailored yet
 - NCCL support was not tailored yet.
 
 ### Stripped Modules/Dependencies
 - [gemmlowp](https://github.com/google/gemmlowp)
 - [mkl](https://software.intel.com/content/www/us/en/develop/tools/math-kernel-library.html)
-- nccl
 
 ### Clues
 - TF: third_party/mlir/tblgen.bzl
@@ -36,6 +35,28 @@ As of Fri May 22 22:22:59 CST 2020, this project is still a Work-In-Progress, wi
 - TF: tensorflow/tensorflow.bzl
 - Using Starlark Debugger: https://github.com/bazelbuild/vscode-bazel#using-the-starlark-debugger
 - [Deprecated] https://github.com/Hibbert-pku/bazel_nvcc.git
+
+## How to Run
+
+### Step 1: Edit `.storydev.bazelrc` to adjust your Python and CUDA Toolkit versions manually.
+TODO(storypku): Provides a `bootstrap` script like Tensorflow's `configure`.
+
+### Step 2: Determine your nVidia GPU's compute capability (abbr. SM), or a list of SMs you want. And perform a **find-and-replace** operation in this REPO accordingly.
+
+TODO(storypku): Check and set SM values (E.g., `sm_61`, `compute_61`) when running `bootstrap`.
+
+### Step 3: Install Bazel 3.0+.
+
+Ref: [GitHub Bazel Release Page](https://github.com/bazelbuild/bazel/releases)
+
+The following was tested on an Ubuntu 18.04 x86_64 machine with Bazel 3.1.0 installed.
+
+### Step 4: Run the `hello-world` example to check if everything works fine.
+```
+bazel build //src:hello_world
+```
+
+TODO(storypku): More examples, esp. shared library use cases.
 
 ## Welcome on board with Bazel~
 

@@ -1,5 +1,5 @@
-# Apollo Bazel configuration file.
-# This file tries to group and simplify build options for Apollo
+# StoryDev Bazel configuration file.
+# This file tries to group and simplify build options for StoryDev
 # +------------------------------------------------------------+
 # | Startup Options                                            |
 # +------------------------------------------------------------+
@@ -54,7 +54,7 @@ build:opt --define with_default_optimizations=true
 # Instruction set optimizations
 build:native_arch_linux --copt=-march=native
 
-# Build Apollo with C++ 17 features.
+# Build StoryDev with C++ 17 features.
 build:c++17 --cxxopt=-std=c++1z
 build:c++17 --cxxopt=-stdlib=libc++
 build:c++1z --config=c++17
