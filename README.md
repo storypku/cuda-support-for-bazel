@@ -2,7 +2,7 @@
 
 ## Introduction
 
-As of Bazel 3.2.0, there is still no native CUDA support in Bazel (Refer to [Bazel issue: Native CUDA Support](https://github.com/bazelbuild/bazel/issues/6578) to see why). As such, I extracted CUDA support for Bazel code from the [Tensorflow](https://github.com/tensorflow/tensorflow.git) project.
+As of Bazel 3.2.0, there is still no native CUDA support in Bazel (Refer to [Bazel issue: Native CUDA Support](https://github.com/bazelbuild/bazel/issues/6578) to see why). As such, I extracted CUDA support for Bazel code from the [TensorFlow](https://github.com/tensorflow/tensorflow.git) project.
 
 The mechanism behind CUDA support for Bazel was Bazel's custom toolchain support. Refer to [tutorial-cc-toolchain-config](https://docs.bazel.build/versions/master/tutorial/cc-toolchain-config.html) for an thorough understanding.
 
