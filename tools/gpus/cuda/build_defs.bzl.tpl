@@ -41,7 +41,7 @@ def if_cuda_clang_opt(if_true, if_false = []):
 def cuda_default_copts():
     """Default options for all CUDA compilations."""
     return if_cuda(
-        ["-x", "cuda", "-DGOOGLE_CUDA=1"]
+        ["-x", "cuda", "-DSTORYDEV_CUDA=1"]
     ) + if_cuda_clang_opt(
         # Some important CUDA optimizations are only enabled at O3.
         ["-O3"]

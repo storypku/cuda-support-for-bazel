@@ -70,7 +70,7 @@ def storydev_copts(allow_exceptions = False):
             "-DEIGEN_AVOID_STL_ARRAY",
             "-Wno-sign-compare",
             "-ftemplate-depth=900",
-        ] + if_cuda(["-DGOOGLE_CUDA=1"]) +
+        ] + if_cuda(["-DSTORYDEV_CUDA=1"]) +
         if_nvcc(["-DSTORYDEV_USE_NVCC=1"]) +
         if_x86_mode(["-msse3"]) +
         (["-fno-exceptions"] if not allow_exceptions else []) +
@@ -84,7 +84,7 @@ def storydev_gpu_library(deps = None, cuda_deps = None, copts = storydev_copts()
 
       - Both deps and cuda_deps are used as dependencies.
       - The cuda runtime is added as a dependency (if necessary).
-      - The library additionally passes -DGOOGLE_CUDA=1 to the list of copts.
+      - The library additionally passes -DSTORYDEV_CUDA=1 to the list of copts.
       - In addition, when the library is also built with TensorRT enabled, it
           additionally passes -DGOOGLE_TENSORRT=1 to the list of copts.
 
@@ -105,7 +105,7 @@ def storydev_gpu_library(deps = None, cuda_deps = None, copts = storydev_copts()
         deps = deps + if_cuda_is_configured_compat(cuda_deps + [
             "@local_config_cuda//cuda:cuda_headers",
         ]),
-        copts = (copts + if_cuda(["-DGOOGLE_CUDA=1"])),
+        copts = (copts + if_cuda(["-DSTORYDEV_CUDA=1"])),
         #if_tensorrt(["-DGOOGLE_TENSORRT=1"])),
         **kwargs
     )

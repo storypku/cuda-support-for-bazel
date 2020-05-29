@@ -22,9 +22,14 @@ As of Fri May 29 08:12:47 CST 2020, this project is still a Work-In-Progress, wi
 - TensorRT support was not tailored yet
 - NCCL support was not tailored yet.
 
-### Stripped Modules/Dependencies
+### Stripped Modules/Dependencies/Options
 - [gemmlowp](https://github.com/google/gemmlowp)
 - [mkl](https://software.intel.com/content/www/us/en/develop/tools/math-kernel-library.html)
+- OpenCL
+- [ROCm](https://github.com/RadeonOpenCompute/ROCm)
+- [XLA](https://www.tensorflow.org/xla), Ref: https://developers.googleblog.com/2017/03/xla-tensorflow-compiled.html
+- [Intel nGraph support](https://github.com/NervanaSystems/ngraph)
+- Option for experimental clang download
 
 ### References
 - TF: third_party/mlir/tblgen.bzl
