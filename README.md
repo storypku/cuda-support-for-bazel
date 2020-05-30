@@ -10,7 +10,7 @@ The mechanism behind CUDA support for Bazel was Bazel's custom toolchain support
 
 Note that CUDA support for Bazel IN THIS REPO was tailored to run on Linux ONLY. Windows and MacOS support are stripped off which are present in the original TensorFlow repo.
 
-As to CPU architectures, ONLY `x86_64` and `aarch64` support are reserved for the editor's own need. If you need support for a different cpu arch, please refer to [Tensorflow](https://github.com/tensorflow/tensorflow.git).
+As to CPU architectures, ONLY `x86_64` and `aarch64` support are reserved for the editor's own need. If you need support for a different cpu arch, please refer to [TensorFlow](https://github.com/tensorflow/tensorflow.git).
 
 The editor also adjusted default CUDA compute capability settings. Only newer NVidia GPU Cards with SM values = ["6.0", "6.1", "7.0", "7.2", "7.5", ...] are supported, and requires CUDA Toolkit with version >= 9.0.
 
