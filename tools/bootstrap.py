@@ -38,11 +38,7 @@ except ImportError:
 _DEFAULT_CUDA_VERSION = '10'
 _DEFAULT_CUDNN_VERSION = '7'
 _DEFAULT_TENSORRT_VERSION = '7'
-_DEFAULT_CUDA_COMPUTE_CAPABILITIES = '3.5,7.0'
-
-_TF_OPENCL_VERSION = '1.2'
-_DEFAULT_COMPUTECPP_TOOLKIT_PATH = '/usr/local/computecpp'
-_DEFAULT_TRISYCL_INCLUDE_DIR = '/usr/local/triSYCL/include'
+_DEFAULT_CUDA_COMPUTE_CAPABILITIES = '6.0,6.1,7.0,7.2,7.5'
 
 _DEFAULT_PROMPT_ASK_ATTEMPTS = 10
 
@@ -873,60 +869,6 @@ def set_host_c_compiler(environ_cp):
     )
 
     write_action_env_to_bazelrc('HOST_C_COMPILER', host_c_compiler)
-
-
-def set_computecpp_toolkit_path(environ_cp):
-    """Set COMPUTECPP_TOOLKIT_PATH."""
-
-    def toolkit_exists(toolkit_path):
-        """Check if a computecpp toolkit path is valid."""
-        sycl_rt_lib_path = 'lib/libComputeCpp.so'
-
-        sycl_rt_lib_path_full = os.path.join(toolkit_path, sycl_rt_lib_path)
-        exists = os.path.exists(sycl_rt_lib_path_full)
-        if not exists:
-            print('Invalid SYCL %s library path. %s cannot be found' %
-                  (_TF_OPENCL_VERSION, sycl_rt_lib_path_full))
-        return exists
-
-    computecpp_toolkit_path = prompt_loop_or_load_from_env(
-        environ_cp,
-        var_name='COMPUTECPP_TOOLKIT_PATH',
-        var_default=_DEFAULT_COMPUTECPP_TOOLKIT_PATH,
-        ask_for_var=(
-            'Please specify the location where ComputeCpp for SYCL %s is '
-            'installed.' % _TF_OPENCL_VERSION),
-        check_success=toolkit_exists,
-        error_msg='Invalid SYCL compiler path. %s cannot be found.',
-        suppress_default_error=True)
-
-    write_action_env_to_bazelrc('COMPUTECPP_TOOLKIT_PATH',
-                                computecpp_toolkit_path)
-
-
-def set_trisycl_include_dir(environ_cp):
-    """Set TRISYCL_INCLUDE_DIR."""
-
-    ask_trisycl_include_dir = ('Please specify the location of the triSYCL '
-                               'include directory. (Use --config=sycl_trisycl '
-                               'when building with Bazel) '
-                               '[Default is %s]: ') % (
-                                   _DEFAULT_TRISYCL_INCLUDE_DIR)
-
-    while True:
-        trisycl_include_dir = get_from_env_or_user_or_default(
-            environ_cp, 'TRISYCL_INCLUDE_DIR', ask_trisycl_include_dir,
-            _DEFAULT_TRISYCL_INCLUDE_DIR)
-        if os.path.exists(trisycl_include_dir):
-            break
-
-        print('Invalid triSYCL include directory, %s cannot be found' %
-              (trisycl_include_dir))
-
-    # Set TRISYCL_INCLUDE_DIR
-    environ_cp['TRISYCL_INCLUDE_DIR'] = trisycl_include_dir
-    write_action_env_to_bazelrc('TRISYCL_INCLUDE_DIR', trisycl_include_dir)
-
 
 def system_specific_test_config(environ_cp):
     """Add default build and test flags required for TF tests to bazelrc."""
