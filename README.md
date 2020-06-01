@@ -1,4 +1,4 @@
-# cuda-support-in-bazel (WIP)
+# cuda-support-in-bazel
 
 ## Introduction
 
