@@ -16,11 +16,12 @@ The editor also adjusted default CUDA compute capability settings. Only newer NV
 
 ## Status
 
-**It works!**
+**CUDA & CUDNN examples works now!**
 
-As of Fri May 29 08:12:47 CST 2020, this project is still a Work-In-Progress, with a few bugs to be fixed.
+As of Fri June 12 18:12:47 CST 2020, this project is still a Work-In-Progress, with the following TODO list:
 - TensorRT support was not tailored yet
 - NCCL support was not tailored yet.
+- BUILD files for cudnn-examples/{mnistCUDNN,multiHeadAttention,RNN}
 
 ### Stripped Modules/Dependencies/Options
 - [gemmlowp](https://github.com/google/gemmlowp)
@@ -45,15 +46,13 @@ As of Fri May 29 08:12:47 CST 2020, this project is still a Work-In-Progress, wi
 #### Step 2: Install Bazel 3.0+.
 Ref: [GitHub Bazel Release Page](https://github.com/bazelbuild/bazel/releases)
 
-The following was tested on an Ubuntu 18.04 x86_64 machine with NVidia GTX 1070, using Bazel 3.2.0.
+All programs were tested on an Ubuntu-18.04 x86_64 machine with one NVidia GTX 1070 GPU card, using Bazel 3.2.0.
 
 #### Step 3: Run the `hello-world` example to check if everything works fine.
 
 ```
 bazel run //src:hello_world
 ```
-
-TODO(storypku): More examples, esp. shared library use cases.
 
 ## Welcome On Board with Bazel!
 
