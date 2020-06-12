@@ -1,4 +1,5 @@
 bazel-*
+examples/bin
 tools/python_bin_path.sh
 .storydev.bazelrc
 *.o
