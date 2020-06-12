@@ -4,7 +4,7 @@
 
   * `TF_NCCL_VERSION`: Installed NCCL version or empty to build from source.
   * `NCCL_INSTALL_PATH` (deprecated): The installation path of the NCCL library.
-  * `NCCL_HDR_PATH` (deprecated): The installation path of the NCCL header 
+  * `NCCL_HDR_PATH` (deprecated): The installation path of the NCCL header
     files.
   * `TF_CUDA_PATHS`: The base paths to look for CUDA and cuDNN. Default is
     `/usr/local/cuda,usr/`.
@@ -12,12 +12,12 @@
 """
 
 load(
-    "//third_party/gpus:cuda_configure.bzl",
+    "//tools/gpus:cuda_configure.bzl",
     "enable_cuda",
     "find_cuda_config",
 )
 load(
-    "//third_party/remote_config:common.bzl",
+    "//tools/remote_config:common.bzl",
     "config_repo_label",
     "get_cpu_value",
     "get_host_environ",
@@ -61,14 +61,14 @@ alias(
 """
 
 def _label(file):
-    return Label("//third_party/nccl:{}".format(file))
+    return Label("//tools/nccl:{}".format(file))
 
 def _create_local_nccl_repository(repository_ctx):
     # Resolve all labels before doing any real work. Resolving causes the
     # function to be restarted with all previous state being lost. This
     # can easily lead to a O(n^2) runtime in the number of labels.
     # See https://github.com/tensorflow/tensorflow/commit/62bd3534525a036f07d9851b3199d68212904778
-    find_cuda_config_path = repository_ctx.path(Label("@org_tensorflow//third_party/gpus:find_cuda_config.py.gz.base64"))
+    find_cuda_config_path = repository_ctx.path(Label("//tools/gpus:find_cuda_config.py.gz.base64"))
 
     nccl_version = get_host_environ(repository_ctx, _TF_NCCL_VERSION, "")
     if nccl_version:
