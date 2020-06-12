@@ -224,7 +224,7 @@ run: build
 	$(EXEC) ./RNN
 
 clean:
-	rm -rf *o
+	rm -rf *o result.txt
 	rm -rf RNN
 
 clobber: clean

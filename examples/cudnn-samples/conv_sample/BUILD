@@ -5,11 +5,17 @@ cuda_library(
     name = "fp16_emu_lib",
     srcs = ["fp16_emu.cpp"],
     hdrs = ["fp16_emu.h"],
+    deps = [
+        "@local_config_cuda//cuda:cudart",
+    ],
 )
 
 cuda_library(
     name = "error_util",
     hdrs = ["error_util.h"],
+    deps = [
+        "@local_config_cuda//cuda:cudart",
+    ],
 )
 
 cuda_library(
@@ -25,7 +31,6 @@ cuda_library(
 cuda_library(
     name = "conv_sample_lib",
     srcs = ["conv_sample.cpp"],
-    copts = ["-Wunused-but-set-variable"],
     deps = [
         ":fp16_dev_lib",
         ":fp16_emu_lib",
@@ -34,12 +39,8 @@ cuda_library(
 
 cc_binary(
     name = "conv_sample",
-    srcs = ["conv_sample.cpp"],
-    copts = ["-Wunused-but-set-variable"],
     deps = [
         ":conv_sample_lib",
-        "@local_config_cuda//cuda:cuda_headers",
-        "@local_config_cuda//cuda:cudart",
         "@local_config_cuda//cuda:cudnn",
     ],
 )
