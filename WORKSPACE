@@ -13,7 +13,7 @@ load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 bazel_skylib_workspace()
 
 load("//tools/gpus:cuda_configure.bzl", "cuda_configure")
-load("//tools:tensorrt/tensorrt_configure.bzl", "tensorrt_configure")
+load("//tools/tensorrt:tensorrt_configure.bzl", "tensorrt_configure")
 
 cuda_configure(name = "local_config_cuda")
 
