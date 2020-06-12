@@ -33,6 +33,7 @@ cuda_library(
 
 cuda_library(
     name = "logger",
+    srcs = ["logger.cpp"],
     hdrs = ["logger.h"],
     deps = [
         ":logging",
@@ -42,9 +43,9 @@ cuda_library(
 cuda_library(
     name = "logging",
     hdrs = ["logging.h"],
-    #    deps = [
-    #        "libnvinfer-dev",
-    #    ],
+    deps = [
+        "@local_config_tensorrt//:tensorrt_headers",
+    ],
 )
 
 cc_binary(
@@ -55,6 +56,7 @@ cc_binary(
         ":buffers",
         ":common",
         ":logger",
+        ":logging",
         "@local_config_cuda//cuda:cudart",
         "@local_config_tensorrt//:tensorrt",
         "@local_config_tensorrt//:tensorrt_headers",

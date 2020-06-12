@@ -24,7 +24,7 @@ _TF_TENSORRT_CONFIG_REPO = "TF_TENSORRT_CONFIG_REPO"
 _TF_TENSORRT_VERSION = "TF_TENSORRT_VERSION"
 _TF_NEED_TENSORRT = "TF_NEED_TENSORRT"
 
-_TF_TENSORRT_LIBS = ["nvinfer", "nvinfer_plugin"]
+_TF_TENSORRT_LIBS = ["nvinfer", "nvinfer_plugin", "nvparsers"]
 _TF_TENSORRT_HEADERS = ["NvInfer.h", "NvUtils.h", "NvInferPlugin.h"]
 _TF_TENSORRT_HEADERS_V6 = [
     "NvInfer.h",
@@ -34,6 +34,8 @@ _TF_TENSORRT_HEADERS_V6 = [
     "NvInferRuntime.h",
     "NvInferRuntimeCommon.h",
     "NvInferPluginUtils.h",
+    "NvUffParser.h",
+    "NvCaffeParser.h",
 ]
 
 _DEFINE_TENSORRT_SONAME_MAJOR = "#define NV_TENSORRT_SONAME_MAJOR"
@@ -101,6 +103,7 @@ def _create_local_tensorrt_repository(repository_ctx):
 
     # Copy the library and header files.
     libraries = [lib_name(lib, cpu_value, trt_version) for lib in _TF_TENSORRT_LIBS]
+
     library_dir = config["tensorrt_library_dir"] + "/"
     headers = _get_tensorrt_headers(trt_version)
     include_dir = config["tensorrt_include_dir"] + "/"
