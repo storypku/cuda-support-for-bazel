@@ -76,7 +76,7 @@
 //
 //7. "-fold" flag is useful for strided cases, FFT algorithm is chosen for demo purposes, but it can be applied to other algorithms as well
 //
-// 8. "-reorderMode" flag is used to reorder the filter and bias matrices for convolution. Use the following arguments to run the 
+// 8. "-reorderMode" flag is used to reorder the filter and bias matrices for convolution. Use the following arguments to run the
 //  convolution with reordered filter and bias matrices.
 //
 //			-filterFormat2 -dataType3 -n5 -c32 -h16 -w16 -k32 -r5 -s5 -reorderMode1 -pad_h0 -pad_w0 -u1 -v1 -b
@@ -141,7 +141,7 @@ static double second (void)
 #elif defined(__QNX__)
 #include <time.h>
 static double second (void)
-{   
+{
     struct timespec tp;
     clock_gettime(CLOCK_REALTIME, &tp);
     return ((double)tp.tv_sec + (double)tp.tv_nsec / 1000000000.0);
@@ -351,7 +351,7 @@ addTensorBiasAct_ref(int DIM,
                      double floor,
                      float alpha,
                      float beta,
-                     cudnnDataType_t dataType) {						 
+                     cudnnDataType_t dataType) {
     bool betaNonZero = (beta != (float)(0.0f));
 
     for (int image = 0; image < outDims[0]; image++) {
@@ -365,15 +365,15 @@ addTensorBiasAct_ref(int DIM,
                     for (int k = 0; k < (DIM == 3 ? outDims[4] : 1); k++) {
                         int idxDest = i * outStride[2] + j * outStride[3];
                         idxDest += (DIM == 3 ? k * outStride[4] : 0);
-						
+
                         float data = convertToFloat((void *)&data_inout[idxDest],dataType);
 
-						data        = (data * alpha);						
+						data        = (data * alpha);
 						if (betaNonZero) {
 							float Z_value = convertToFloat((void *)&Z_in[idxDest],dataType);
                             data = doFma(Z_value, beta, data);
                         }
-						
+
                         data = (data + data_bias);
                         data = std::max(data, (float)(floor));  // clipping floor (implements ReLU)
                         data = std::min(data, (float)(ceil));   // clipping ceil (implements clipped ReLU)
@@ -749,7 +749,7 @@ int doConv(
         cudaMalloc(&workSpace, workSpaceSize);
     }
 
-	 start = second();	 
+	 start = second();
 	 checkCudnnErr ( cudnnConvolutionForward (handle_,
 				    (void*)(&alpha),
 				    cudnnIdesc, devPtrI,
@@ -760,7 +760,7 @@ int doConv(
 				    (void*)(&beta),
 				    cudnnOdesc, devPtrO) );
 	 checkCudaErr( cudaDeviceSynchronize() );
-	
+
     // host time end
     stop = second();
 
@@ -783,8 +783,8 @@ int doConv(
 		} else {
 			conv_cpu_ref<T_ELEM, float>( hostI, hostF, hostO, alpha, beta, 1, filterFormat, dimA, filterdimA, outdimA, strideA, outstrideA, convstrideA, padA, dilationA, 4);
 		}
-    
-		
+
+
 		for (int index = 0; index < outsize; index++) {
 			float diff = getError(hostOfromdev[index], hostO[index]);
 			if (diff < 0) diff = -diff;
@@ -794,7 +794,7 @@ int doConv(
 				//printf("cuda result is %d, and reference is %d\n", hostOfromdev[index], hostO[index]);
 		}
 	}
-        
+
 clean:
     if (hostOfromdev) free(hostOfromdev);
     if (workSpace) cudaFree(workSpace);
@@ -870,9 +870,9 @@ doConvBiasAct(cudnnHandle_t handle_,
                                                         activationDesc,
                                                         cudnnOdesc,
                                                         devPtrO));
-                                   
-                                    
-    
+
+
+
     checkCudaErr(cudaDeviceSynchronize());
     checkCudaErr(cudaMemcpy(hostOfromdev, devPtrO, sizeof(hostO[0]) * outsize, cudaMemcpyDeviceToHost));
     if(!benchmark){
@@ -880,19 +880,19 @@ doConvBiasAct(cudnnHandle_t handle_,
 		if (filterFormat == CUDNN_TENSOR_NCHW_VECT_C) {
 			if (dataType == CUDNN_DATA_INT8x4) {//resizeFactor = 4
 				conv_cpu_ref<T_ELEM, int32_t>( hostI, hostF, hostO, alpha, beta, 4, filterFormat, dimA, filterdimA, outdimA, strideA, outstrideA, convstrideA, padA, dilationA, 4);
-				addTensorBiasAct_ref<T_ELEM, float>(2, outdimA, outstrideA, biasstrideA, hostO, hostZ,hostBias, DBL_MAX, 0, one, zero, dataType);
+				addTensorBiasAct_ref<T_ELEM, float>(2, outdimA, outstrideA, NULL, hostO, hostZ,hostBias, DBL_MAX, 0, one, zero, dataType);
 			} else if (dataType == CUDNN_DATA_INT8x32) {//resizeFactor = 32
 				conv_cpu_ref<T_ELEM, int32_t>( hostI, hostF, hostO, alpha, beta, 32, filterFormat, dimA, filterdimA, outdimA, strideA, outstrideA, convstrideA, padA, dilationA, 4);
-			    addTensorBiasAct_ref<T_ELEM, float>(2, outdimA, outstrideA, biasstrideA, hostO, hostZ, hostBias, DBL_MAX, 0, one, zero, dataType);
+			    addTensorBiasAct_ref<T_ELEM, float>(2, outdimA, outstrideA, NULL, hostO, hostZ, hostBias, DBL_MAX, 0, one, zero, dataType);
 			} else {
 				printf("CUDNN_TENSOR_NCHW_VECT_C only supports INT8x4 and INT8x32");
 				return 1;
 			}
 		} else {
 			conv_cpu_ref<T_ELEM, float>( hostI, hostF, hostO, alpha, beta, 1, filterFormat, dimA, filterdimA, outdimA, strideA, outstrideA, convstrideA, padA, dilationA, 4);
-			addTensorBiasAct_ref<T_ELEM, float>(2, outdimA, outstrideA, biasstrideA, hostO, hostZ, hostBias, DBL_MAX, 0, one, zero, dataType);
+			addTensorBiasAct_ref<T_ELEM, float>(2, outdimA, outstrideA, NULL, hostO, hostZ, hostBias, DBL_MAX, 0, one, zero, dataType);
 		}
-    
+
 		for (int index = 0; index < outsize; index++) {
 			float diff = getError(hostOfromdev[index], hostO[index]);
 			if (diff < 0) diff = -diff;
@@ -939,7 +939,7 @@ int doDgrad(
 
     int insize = strideA[0]*dimA[0];
     T_ELEM* hostIfromdev = (T_ELEM*)calloc (insize, sizeof(hostI[0]) );
-    // Uses FFT tiling for demonstration purpose when folding is set as true, folding can be used in combination with other algorithms as well 
+    // Uses FFT tiling for demonstration purpose when folding is set as true, folding can be used in combination with other algorithms as well
     cudnnConvolutionBwdDataAlgo_t algo = fold ? CUDNN_CONVOLUTION_BWD_DATA_ALGO_FFT_TILING : CUDNN_CONVOLUTION_BWD_DATA_ALGO_1;
 
     void *workSpace = 0;
@@ -958,7 +958,7 @@ int doDgrad(
         cudnnCreateConvolutionDescriptor (&foldedConvDesc);
         cudnnTensorDescriptor_t foldedGradDesc;
         cudnnCreateTensorDescriptor(&foldedGradDesc);
-        
+
 
         //create empty transform descriptors
         cudnnTensorTransformDescriptor_t filterFoldTransDesc;
@@ -1002,7 +1002,7 @@ int doDgrad(
         size_t paddedDiffDescSize, unpaddedDiffDescSize;
         cudnnGetTensorSizeInBytes(paddedDiffDesc, &paddedDiffDescSize);
         cudnnGetTensorSizeInBytes(cudnnOdesc, &unpaddedDiffDescSize);
-        if(paddedDiffDescSize != unpaddedDiffDescSize){    
+        if(paddedDiffDescSize != unpaddedDiffDescSize){
             cudaMalloc(&paddedDiffData, paddedDiffDescSize);
             if (paddedDiffData == NULL) {
                 printf("Not enough workspace to allocate paddedDiffData!\n");
@@ -1051,14 +1051,14 @@ int doDgrad(
     checkCudnnErr (cudnnConvolutionBackwardData(handle_,
                                                 (void*)(&foldAlpha),
                                                 foldedFilterDesc, foldedFilterData,
-                                                paddedDiffDesc, paddedDiffData, 
+                                                paddedDiffDesc, paddedDiffData,
                                                 foldedConvDesc,
                                                 algo,
                                                 workSpace, workSpaceSize,
                                                 (void*)(&foldBeta),
                                                 foldedGradDesc, foldedGradData));
 
-    // Unfold the grad data        
+    // Unfold the grad data
     status = cudnnTransformTensorEx(handle_,
                                     gradUnfoldTransDesc,
                                     (void *)&alpha,
@@ -1225,7 +1225,7 @@ int doTest(int algo, int* dimA, int* padA, int* convstrideA, int* filterdimA, cu
     cudnnTensorDescriptor_t cudnnBiasdesc;
 	cudnnActivationDescriptor_t activationDesc;
     cudnnConvolutionDescriptor_t cudnnConvDesc;
-    
+
     bool convBiasAct = (algo == 1) ? true : false;
 
     int convDim = 2;
@@ -1237,8 +1237,6 @@ int doTest(int algo, int* dimA, int* padA, int* convstrideA, int* filterdimA, cu
     int insize      = 0;
     int filtersize  = 0;
     int outdimA[]   = {1, 8, 30, 30};
-    int biasdimA[4];
-    int biasstrideA[4];
     int outsize  = 0;
     int biasSize = 1;
 
@@ -1299,7 +1297,7 @@ int doTest(int algo, int* dimA, int* padA, int* convstrideA, int* filterdimA, cu
     printf("padded output dims are %d, %d, %d, %d\n", outdimA_padded[0], outdimA_padded[1], outdimA_padded[2], outdimA_padded[3]);
 
     checkCudnnErr(cudnnCreate(&handle_));
-    
+
     checkCudnnErr( cudnnCreateTensorDescriptor( &cudnnIdesc ));
     checkCudnnErr( cudnnCreateFilterDescriptor( &cudnnFdesc ));
     checkCudnnErr( cudnnCreateTensorDescriptor( &cudnnOdesc ));
@@ -1315,23 +1313,19 @@ int doTest(int algo, int* dimA, int* padA, int* convstrideA, int* filterdimA, cu
 
     generateStrides(outdimA_padded, outstrideA_padded, 4, filterFormat);
     outsize = outdimA_padded[0] * outdimA_padded[1] * outdimA_padded[2] * outdimA_padded[3];
-    
+
     for (int i = 0; i < 4; i++) {
-        biasdimA[i]           = 1;
         biasdimA_padded[i]    = 1;
-        biasstrideA[i] 		  = 1;
         biasstrideA_padded[i] = 1;
     }
 
-    biasdimA[1]           = outdimA[1];
     biasdimA_padded[1]    = outdimA_padded[1];
-    biasstrideA[0]        = biasdimA[1];
     biasstrideA_padded[0] = biasdimA_padded[1];
 
     for (int i = 0; i < 4; i++) {
         biasSize *= biasdimA_padded[i];
     }
-    
+
     cudaMalloc((void**)&(devPtrI), (insize) * sizeof(devPtrI[0]));
     cudaMalloc((void**)&(devPtrF), (filtersize) * sizeof(devPtrF[0]));
     cudaMalloc((void**)&(devPtrReorderedF), (filtersize) * sizeof(devPtrF[0]));
@@ -1345,7 +1339,7 @@ int doTest(int algo, int* dimA, int* padA, int* convstrideA, int* filterdimA, cu
     hostZ             = (T_ELEM*)calloc(outsize, sizeof(hostZ[0]));
     hostBias          = (float*)calloc(biasSize, sizeof(hostBias[0]));
     hostReorderedBias = (float*)calloc(biasSize, sizeof(hostReorderedBias[0]));
-    
+
 	if (filterFormat == CUDNN_TENSOR_NCHW_VECT_C) {
         initImagePadded((int8_t*)hostI, dimA, dimA_padded, strideA_padded, dataType);
         initImagePadded((int8_t*)hostF, filterdimA, filterdimA_padded, filterstrideA_padded, dataType);
@@ -1355,7 +1349,7 @@ int doTest(int algo, int* dimA, int* padA, int* convstrideA, int* filterdimA, cu
         initImage(hostI, insize);
         initImage(hostF, filtersize);
         initImage(hostO, outsize);
-        initImage(hostZ, outsize);       
+        initImage(hostZ, outsize);
     }
 
     checkCudaErr(cudaMemcpy(devPtrI, hostI, sizeof(hostI[0]) * insize, cudaMemcpyHostToDevice));
@@ -1396,20 +1390,20 @@ int doTest(int algo, int* dimA, int* padA, int* convstrideA, int* filterdimA, cu
 		checkCudnnErr( cudnnSetTensorNdDescriptor(cudnnBiasdesc, CUDNN_DATA_FLOAT, convDim + 2, biasdimA_padded, biasstrideA_padded));
 		checkCudnnErr( cudnnSetActivationDescriptor(activationDesc, CUDNN_ACTIVATION_RELU, CUDNN_NOT_PROPAGATE_NAN, /*reluCeiling*/ 10000.0));
 	}
-    
+
     // The below avoids extra if statements for simplicity; if the use case doesn't need to reorder the filter then the user needs not use devPrtReorderedF at all
     if(reorder == CUDNN_DEFAULT_REORDER){
 			if(dataType == CUDNN_DATA_INT8x32){
-				checkCudnnErr( cudnnReorderFilterAndBias(handle_, 
-														 cudnnFdesc, 
-														 CUDNN_DEFAULT_REORDER, 
-														 devPtrF, 
-														 devPtrReorderedF, 
-														 convBiasAct, 
-														 devPtrBias, 
+				checkCudnnErr( cudnnReorderFilterAndBias(handle_,
+														 cudnnFdesc,
+														 CUDNN_DEFAULT_REORDER,
+														 devPtrF,
+														 devPtrReorderedF,
+														 convBiasAct,
+														 devPtrBias,
 														 devPtrReorderedBias));
-														 
-				checkCudnnErr( cudnnSetConvolutionReorderType(cudnnConvDesc, CUDNN_NO_REORDER)); 
+
+				checkCudnnErr( cudnnSetConvolutionReorderType(cudnnConvDesc, CUDNN_NO_REORDER));
 			}else{
 				printf("ERROR: incorrect parameters provided for filter and bias reorder\n");
 				return -1;
@@ -1420,7 +1414,7 @@ int doTest(int algo, int* dimA, int* padA, int* convstrideA, int* filterdimA, cu
 			checkCudaErr( cudaMemcpy(devPtrReorderedBias, devPtrBias, sizeof(devPtrBias[0]) * biasSize, cudaMemcpyDeviceToDevice));
 		}
 	}
-			
+
     if (mathType == 1) {
         checkCudnnErr( cudnnSetConvolutionMathType(cudnnConvDesc, CUDNN_TENSOR_OP_MATH) );
     }
@@ -1579,19 +1573,19 @@ clean:
 inline void selectDataType(int userSpecifiedDataType, cudnnDataType_t &dataType, int &error)
 {
 	switch(userSpecifiedDataType){
-		case 0: 
+		case 0:
 			dataType = CUDNN_DATA_FLOAT;
 			break;
-		case 1: 
+		case 1:
 			dataType = CUDNN_DATA_HALF;
 			break;
-		case 2: 
+		case 2:
 			dataType = CUDNN_DATA_INT8x4;
 			break;
-		case 3: 
+		case 3:
 			dataType = CUDNN_DATA_INT8x32;
 			break;
-		default: 
+		default:
 			error++;
 			break;
 	}
@@ -1650,7 +1644,7 @@ int main( int argc, char** argv )
                 if ( strncmp( argv[0]+1, "fold" , strlen("fold")) == 0) {
                      fold = true;
                 }
-                
+
                 break;
             case 'h':
                 dimA[2] = atol(argv[0]+2);
@@ -1722,7 +1716,7 @@ int main( int argc, char** argv )
     cudaGetDevice(&device);
     cudaGetDeviceProperties(&devProp, device);
     int deviceVer = devProp.major * 10 + devProp.minor;
-    
+
     if(dataType == CUDNN_DATA_FLOAT){
 		if(filterFormat == CUDNN_TENSOR_NCHW_VECT_C){
 			printf("INT8x4 and INT8x32 tests use CUDNN_TENSOR_NCHW_VECT_C\n");
@@ -1765,15 +1759,15 @@ int main( int argc, char** argv )
 		printf("ERROR: This sample only supports FLOAT, HALF, INT8x4 and INT8x32 DATATYPE!\n");
 		return -1;
 	}
-	
-	
+
+
 	typedef int (*doTest_launcher)(int algo, int* dimA, int* padA, int* convstrideA, int* filterdimA, cudnnTensorFormat_t filterFormat, cudnnDataType_t dataType, int mathType, int benchmark, bool fold, cudnnConvolutionMode_t mode, cudnnReorderType_t reorder);
-	
+
 	const doTest_launcher doTest_funcs[3] = {
 		doTest<float>,
 		doTest<half1>,
 		doTest<int8_t>
-	};	
+	};
 	userSpecifiedDataType = (userSpecifiedDataType == 3) ? 2 : userSpecifiedDataType;
 	doTest_funcs[userSpecifiedDataType](algo, dimA, padA, convstrideA, filterdimA, filterFormat, dataType, mathType, benchmark, fold, mode, reorder);
 
