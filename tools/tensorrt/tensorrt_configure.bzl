@@ -7,13 +7,13 @@
 """
 
 load(
-    "//third_party/gpus:cuda_configure.bzl",
+    "//tools/gpus:cuda_configure.bzl",
     "find_cuda_config",
     "lib_name",
     "make_copy_files_rule",
 )
 load(
-    "//third_party/remote_config:common.bzl",
+    "//tools/platform:common.bzl",
     "config_repo_label",
     "get_cpu_value",
     "get_host_environ",
@@ -51,7 +51,7 @@ def _get_tensorrt_headers(tensorrt_version):
     return _TF_TENSORRT_HEADERS
 
 def _tpl_path(repository_ctx, filename):
-    return repository_ctx.path(Label("//third_party/tensorrt:%s.tpl" % filename))
+    return repository_ctx.path(Label("//tools/tensorrt:%s.tpl" % filename))
 
 def _tpl(repository_ctx, tpl, substitutions):
     repository_ctx.template(
@@ -75,7 +75,7 @@ def _create_dummy_repository(repository_ctx):
     # Copy license file in non-remote build.
     repository_ctx.template(
         "LICENSE",
-        Label("//third_party/tensorrt:LICENSE"),
+        Label("//tools/tensorrt:LICENSE"),
         {},
     )
 
@@ -88,7 +88,7 @@ def _create_local_tensorrt_repository(repository_ctx):
     # function to be restarted with all previous state being lost. This
     # can easily lead to a O(n^2) runtime in the number of labels.
     # See https://github.com/tensorflow/tensorflow/commit/62bd3534525a036f07d9851b3199d68212904778
-    find_cuda_config_path = repository_ctx.path(Label("@storydev//tools/gpus:find_cuda_config.py.gz.base64"))
+    find_cuda_config_path = repository_ctx.path(Label("//tools/gpus:find_cuda_config.py.gz.base64"))
     tpl_paths = {
         "build_defs.bzl": _tpl_path(repository_ctx, "build_defs.bzl"),
         "BUILD": _tpl_path(repository_ctx, "BUILD"),
@@ -136,7 +136,7 @@ def _create_local_tensorrt_repository(repository_ctx):
     # Copy license file in non-remote build.
     repository_ctx.template(
         "LICENSE",
-        Label("//third_party/tensorrt:LICENSE"),
+        Label("//tools/tensorrt:LICENSE"),
         {},
     )
 
@@ -185,15 +185,15 @@ _ENVIRONS = [
     "TF_CUDA_PATHS",
 ]
 
-remote_tensorrt_configure = repository_rule(
-    implementation = _create_local_tensorrt_repository,
-    environ = _ENVIRONS,
-    remotable = True,
-    attrs = {
-        "environ": attr.string_dict(),
-    },
-)
-
+#remote_tensorrt_configure = repository_rule(
+#    implementation = _create_local_tensorrt_repository,
+#    environ = _ENVIRONS,
+#    remotable = True,
+#    attrs = {
+#        "environ": attr.string_dict(),
+#    },
+#)
+#
 tensorrt_configure = repository_rule(
     implementation = _tensorrt_configure_impl,
     environ = _ENVIRONS + [_TF_TENSORRT_CONFIG_REPO],
