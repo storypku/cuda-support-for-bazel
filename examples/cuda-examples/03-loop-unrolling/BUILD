@@ -1,6 +1,6 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
-load("//tools:storydev.bzl", "storydev_gpu_library")
+#load("//tools:storydev.bzl", "storydev_gpu_library")
 
 cc_library(
     name = "cuda_exception",
