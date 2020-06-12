@@ -1,10 +1,10 @@
-# cuda-support-in-bazel
+# CUDA Support for Bazel
 
 ## Introduction
 
-As of Bazel 3.2.0, there is still no native CUDA support in Bazel (Refer to [Bazel issue: Native CUDA Support](https://github.com/bazelbuild/bazel/issues/6578) to see why). As such, I extracted CUDA support for Bazel code from the [TensorFlow](https://github.com/tensorflow/tensorflow.git) project.
+As of Bazel 3.2.0, there is still no native CUDA support in Bazel (Refer to [Bazel issue: Native CUDA Support](https://github.com/bazelbuild/bazel/issues/6578) to see why). As such, I extracted CUDA support code for Bazel from the [TensorFlow](https://github.com/tensorflow/tensorflow.git) project.
 
-The mechanism behind CUDA support for Bazel was Bazel's custom toolchain support. Refer to [tutorial-cc-toolchain-config](https://docs.bazel.build/versions/master/tutorial/cc-toolchain-config.html) for an thorough understanding.
+The mechanism behind CUDA support for Bazel was Bazel's custom toolchain support. Refer to [tutorial-cc-toolchain-config](https://docs.bazel.build/versions/master/tutorial/cc-toolchain-config.html) for an thorough understanding on Bazel's `cc-toolchain-config`.
 
 ## Warnings Ahead
 
@@ -12,7 +12,7 @@ Note that CUDA support for Bazel IN THIS REPO was tailored to run on Linux ONLY.
 
 As to CPU architectures, ONLY `x86_64` and `aarch64` support are reserved for the editor's own need. If you need support for a different cpu arch, please refer to [TensorFlow](https://github.com/tensorflow/tensorflow.git).
 
-The editor also adjusted default CUDA compute capability settings. Only newer NVidia GPU Cards with SM values = ["6.0", "6.1", "7.0", "7.2", "7.5", ...] are supported, and requires CUDA Toolkit with version >= 9.0.
+The editor also adjusted default CUDA compute capability settings. Only newer NVidia GPU Cards with SM values = [6.0, 6.1, 7.0, 7.2, 7.5, ...] are supported, and requires CUDA Toolkit with version >= 9.0.
 
 ## Status
 
