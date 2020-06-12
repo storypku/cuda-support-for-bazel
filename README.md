@@ -21,7 +21,7 @@ The editor also adjusted default CUDA compute capability settings. Only newer NV
 As of Fri June 12 18:12:47 CST 2020, this project is still a Work-In-Progress, with the following TODO list:
 - TensorRT support was not tailored yet
 - NCCL support was not tailored yet.
-- BUILD files for cudnn-examples/{mnistCUDNN,multiHeadAttention,RNN}
+- BUILD file for cudnn-examples/mnistCUDNN
 
 ### Stripped Modules/Dependencies/Options
 - [gemmlowp](https://github.com/google/gemmlowp)
