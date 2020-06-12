@@ -58,7 +58,7 @@ inline double seconds(void) {
 #error UNSUPPORTED PLATFORM FOR TIME FUNCTION
 #endif
 
-// Returns uniformly distributed integer values between [lower,..,upper], 
+// Returns uniformly distributed integer values between [lower,..,upper],
 // ie, with both lower and upper limits included.
 inline int randRangeInt(int lower, int upper) {
     int lo  = (lower < upper ? lower : upper);
@@ -66,7 +66,7 @@ inline int randRangeInt(int lower, int upper) {
     return lo + int(drand48() * (hi - lo + 1));
 }
 
-// Returns uniformly distributed floating point values between [bias, bias+range) 
+// Returns uniformly distributed floating point values between [bias, bias+range)
 // assuming range>0, ie, including the lower limit but excluding the upper bound.
 inline double randRangeDbl(double bias, double range) {
     return range * drand48() + bias;
@@ -150,7 +150,7 @@ void saveAllParams(cudnnHandle_t handle, cudnnAttnDescriptor_t desc, bool isGgra
 
         CHECK_CUDNN_ERR(cudnnGetTensorNdDescriptor(weightDesc, 3, &dataTypeUnsed, &nbDims, dimA, strideA));
 
-        // cudnnGetMultiHeadAttnWeights() reports a wrong stride in ealier 
+        // cudnnGetMultiHeadAttnWeights() reports a wrong stride in ealier
         // cuDNN versions for input projection weight tensors.
         if (cudnnGetVersion() < 7602 && wKind[i] != CUDNN_MH_ATTN_O_WEIGHTS) {
             strideA[2] = dimA[0] * dimA[1];
@@ -327,8 +327,6 @@ void MultiheadAttentionTest<IS_TRAINING, T_ELEM, T_MATH>::setup(testOpts &opts) 
         }
     }
 
-    int qProjLen = mainCfg.qLength();
-    int kProjLen = mainCfg.kLength();
     int outLen   = mainCfg.oLength();
 
     mainCfg.dataLayout = opts.attnDataLayout;
@@ -784,11 +782,6 @@ void MultiheadAttentionTest<IS_TRAINING, T_ELEM, T_MATH>::run() {
     size_t vNmbElem = testCfg.vAllData();
     size_t oNmbElem = testCfg.oAllData();
 
-    size_t qNmbWeights = testCfg.qAllWeights();
-    size_t kNmbWeights = testCfg.kAllWeights();
-    size_t vNmbWeights = testCfg.vAllWeights();
-    size_t oNmbWeights = testCfg.oAllWeights();
-
     // Sanity check so we do not over-run the allocated buffers.
     if (qNmbElem > maxElemQ || kNmbElem > maxElemK || vNmbElem > maxElemV || oNmbElem > maxElemO) {
         fprintf(stderr, "ERROR: inconsistent data buffer sizes\n\n");
@@ -1149,8 +1142,8 @@ int main(int argc, char **argv) {
 
     parseAttnParameters(argc, argv, &opts);
 
-    static do_test_fp func_arr[] = { 
-        doTest<false, float,  float >, 
+    static do_test_fp func_arr[] = {
+        doTest<false, float,  float >,
         doTest<true,  float,  float >,
         doTest<false, double, double>,
         doTest<true,  double, double>,
