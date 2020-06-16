@@ -16,10 +16,9 @@ The editor also adjusted default CUDA compute capability settings. Only newer NV
 
 ## Status
 
-**CUDA & CUDNN examples works now!**
+**CUDA & CUDNN & TensorRT examples WORK now!**
 
-As of Fri June 12 18:12:47 CST 2020, this project is still a Work-In-Progress, with the following TODO list:
-- TensorRT support was not tailored yet
+As of Fri June 16 18:12:47 CST 2020, this project is still a Work-In-Progress, with the following TODO list:
 - NCCL support was not tailored yet.
 - BUILD file for cudnn-examples/mnistCUDNN
 
@@ -51,6 +50,7 @@ All programs were tested on an Ubuntu-18.04 x86_64 machine with one NVidia GTX 1
 #### Step 3: Run the `hello-world` example to check if everything works fine.
 
 ```
+bazel build //...
 bazel run //src:hello_world
 ```
 
