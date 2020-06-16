@@ -87,7 +87,7 @@ cc_library(
         "src/nccl.h",
     ],
     hdrs = ["src/nccl.h"],
-    include_prefix = "third_party/nccl",
+    include_prefix = "tools/nccl",
     linkopts = ["-lrt"],
     strip_include_prefix = "src",
     visibility = ["//visibility:public"],

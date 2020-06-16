@@ -17,7 +17,7 @@ load(
     "find_cuda_config",
 )
 load(
-    "//tools/remote_config:common.bzl",
+    "//tools/platform:common.bzl",
     "config_repo_label",
     "get_cpu_value",
     "get_host_environ",
@@ -121,7 +121,7 @@ def _create_remote_nccl_repository(repository_ctx, remote_config_repo):
 
 def _nccl_autoconf_impl(repository_ctx):
     if (not enable_cuda(repository_ctx) or
-        get_cpu_value(repository_ctx) not in ("Linux", "FreeBSD")):
+        get_cpu_value(repository_ctx) != "Linux":
         # Add a dummy build file to make bazel query happy.
         repository_ctx.file("BUILD", _NCCL_DUMMY_BUILD_CONTENT)
     elif get_host_environ(repository_ctx, "TF_NCCL_CONFIG_REPO") != None:

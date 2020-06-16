@@ -7,7 +7,7 @@ cc_library(
     name = "nccl",
     srcs = ["libnccl.so.%{nccl_version}"],
     hdrs = ["nccl.h"],
-    include_prefix = "third_party/nccl",
+    include_prefix = "tools/nccl",
     visibility = ["//visibility:public"],
     deps = [
         "@local_config_cuda//cuda:cuda_headers",
