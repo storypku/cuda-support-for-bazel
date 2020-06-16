@@ -50,7 +50,7 @@ All programs were tested on an Ubuntu-18.04 x86_64 machine with one NVidia GTX 1
 #### Step 3: Run the `hello-world` example to check if everything works fine.
 
 ```
-bazel build //...
+bazel build --config=opt //...
 bazel run //src:hello_world
 ```
 
