@@ -1,6 +1,9 @@
 workspace(name = "storydev")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("//tools:workspace.bzl", "storydev_repositories")
+
+storydev_repositories()
 
 http_archive(
     name = "bazel_skylib",
@@ -11,10 +14,3 @@ http_archive(
 load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 
 bazel_skylib_workspace()
-
-load("//tools/gpus:cuda_configure.bzl", "cuda_configure")
-load("//tools/tensorrt:tensorrt_configure.bzl", "tensorrt_configure")
-
-cuda_configure(name = "local_config_cuda")
-
-tensorrt_configure(name = "local_config_tensorrt")

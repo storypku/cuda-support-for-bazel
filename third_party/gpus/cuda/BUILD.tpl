@@ -34,7 +34,7 @@ cuda_header_library(
         "cuda/cuda_config.h",
         ":cuda-include"
     ],
-    include_prefix = "tools/gpus",
+    include_prefix = "third_party/gpus",
     includes = [
         ".",  # required to include cuda/cuda/cuda_config.h as cuda/config.h
         "cuda/include",
@@ -66,10 +66,46 @@ cc_library(
 cuda_header_library(
     name = "cublas_headers",
     hdrs = [":cublas-include"],
-    include_prefix = "tools/gpus/cuda/include",
+    include_prefix = "third_party/gpus/cuda/include",
     strip_include_prefix = "cublas/include",
     deps = [":cuda_headers"],
     includes = ["cublas/include"],
+)
+
+cuda_header_library(
+    name = "cusolver_headers",
+    hdrs = [":cusolver-include"],
+    include_prefix = "third_party/gpus/cuda/include",
+    strip_include_prefix = "cusolver/include",
+    deps = [":cuda_headers"],
+    includes = ["cusolver/include"],
+)
+
+cuda_header_library(
+    name = "cufft_headers",
+    hdrs = [":cufft-include"],
+    include_prefix = "third_party/gpus/cuda/include",
+    strip_include_prefix = "cufft/include",
+    deps = [":cuda_headers"],
+    includes = ["cufft/include"],
+)
+
+cuda_header_library(
+    name = "cusparse_headers",
+    hdrs = [":cusparse-include"],
+    include_prefix = "third_party/gpus/cuda/include",
+    strip_include_prefix = "cusparse/include",
+    deps = [":cuda_headers"],
+    includes = ["cusparse/include"],
+)
+
+cuda_header_library(
+    name = "curand_headers",
+    hdrs = [":curand-include"],
+    include_prefix = "third_party/gpus/cuda/include",
+    strip_include_prefix = "curand/include",
+    deps = [":cuda_headers"],
+    includes = ["curand/include"],
 )
 
 cc_library(
@@ -97,7 +133,7 @@ cc_library(
 cc_library(
     name = "cudnn_header",
     hdrs = [":cudnn-include"],
-    include_prefix = "tools/gpus/cudnn",
+    include_prefix = "third_party/gpus/cudnn",
     strip_include_prefix = "cudnn/include",
     deps = [":cuda_headers"],
 )
@@ -128,10 +164,15 @@ cc_library(
     ],
 )
 
+alias(
+    name = "cub_headers",
+    actual = "%{cub_actual}"
+)
+
 cuda_header_library(
     name = "cupti_headers",
     hdrs = [":cuda-extras"],
-    include_prefix="tools/gpus",
+    include_prefix="third_party/gpus",
     includes = ["cuda/extras/CUPTI/include/"],
     deps = [":cuda_headers"],
 )
@@ -170,4 +211,10 @@ bzl_library(
     ],
 )
 
+py_library(
+    name = "cuda_config_py",
+    srcs = ["cuda/cuda_config.py"]
+)
+
 %{copy_rules}
+

@@ -926,7 +926,7 @@ def validate_cuda_config(environ_cp):
         cuda_libraries.append('nccl')
 
     proc = subprocess.Popen(
-        [environ_cp['PYTHON_BIN_PATH'], 'tools/gpus/find_cuda_config.py'] +
+        [environ_cp['PYTHON_BIN_PATH'], 'third_party/gpus/find_cuda_config.py'] +
         cuda_libraries,
         stdout=subprocess.PIPE,
         env=maybe_encode_env(environ_cp))
