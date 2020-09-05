@@ -17,7 +17,7 @@ common --color=yes
 # | Build Configurations                                       |
 # +------------------------------------------------------------+
 # Make Bazel print out all options from rc files.
-build --announce_rc
+# build --announce_rc
 build --show_timestamps
 
 # Work around the sandbox issue.
@@ -46,7 +46,6 @@ build --define=INCLUDEDIR=$(PREFIX)/include
 # dbg config, as a shorthand for '--config=opt -c dbg'
 build:dbg --config=opt -c dbg
 
-## build -c opt
 build:opt --copt=-march=native
 build:opt --host_copt=-march=native
 build:opt --define with_default_optimizations=true
@@ -68,19 +67,9 @@ build --host_cxxopt="-std=c++14"
 # +------------------------------------------------------------+
 test --flaky_test_attempts=3
 test --test_size_filters=small,medium
-test --test_env=LD_LIBRARY_PATH
 
 # By default prints output only from failed tests.
 test --test_output=errors
-
-test:coverage --copt="--coverage"
-test:coverage --cxxopt=--coverage
-test:coverage --cxxopt=-fprofile-arcs
-test:coverage --cxxopt=-ftest-coverage
-test:coverage --linkopt=-coverage
-test:coverage --linkopt=-lgcov
-test:coverage --linkopt=-lgcc
-test:coverage --linkopt=-lc
 
 # +------------------------------------------------------------+
 # | CPP Lint Tests & Unit Tests                                |
