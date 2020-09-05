@@ -585,8 +585,8 @@ def _file(repository_ctx, label):
 
 _DUMMY_CROSSTOOL_BZL_FILE = """
 def error_gpu_disabled():
-  fail("ERROR: Building with --config=cuda but Apollo is not configured " +
-       "to build with GPU support. Please re-run ./scripts/apollo_config.sh" +
+  fail("ERROR: Building with --config=cuda but storydev is not configured " +
+       "to build with GPU support. Please re-run ./bootstrap.sh" +
        "to build with GPU support.")
 
   native.genrule(

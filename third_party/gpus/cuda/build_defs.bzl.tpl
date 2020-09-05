@@ -38,12 +38,12 @@ def if_cuda_clang_opt(if_true, if_false = []):
        "//conditions:default": if_false
    })
 
-# TODO(storypku): revisit the APOLLO_CUDA macro
+# TODO(storypku): revisit the STORYDEV_CUDA macro
 def cuda_default_copts():
     """Default options for all CUDA compilations."""
     return if_cuda([
         "-x", "cuda",
-        "-DAPOLLO_CUDA=1",
+        "-DSTORYDEV_CUDA=1",
         "-Xcuda-fatbinary=--compress-all",
         "--no-cuda-include-ptx=all"
     ] + %{cuda_extra_copts}) + if_cuda_clang_opt(
