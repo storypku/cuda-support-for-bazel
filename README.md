@@ -1,6 +1,12 @@
 # CUDA Support for Bazel
 
-This repo is deprecated in favor of rules_cuda. Ref: https://github.com/tensorflow/runtime/tree/master/third_party/rules_cuda
+---
+
+**Updates of 2022.04.02**
+
+This repo is deprecated in favor of [rules_cuda](https://github.com/tensorflow/runtime/tree/master/third_party/rules_cuda).
+
+---
 
 ## Introduction
 
