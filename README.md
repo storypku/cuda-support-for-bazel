@@ -1,5 +1,7 @@
 # CUDA Support for Bazel
 
+This repo is deprecated in favor of rules_cuda. Ref: https://github.com/tensorflow/runtime/tree/master/third_party/rules_cuda
+
 ## Introduction
 
 As of Bazel 3.5.0, there is still no native CUDA support in Bazel (Refer to
